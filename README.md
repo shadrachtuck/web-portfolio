@@ -48,3 +48,22 @@ Connects to the shared WordPress backend via WPGraphQL at the endpoint specified
 
 The backend repository: https://github.com/shadrachtuck/portfolio-backend.git
 
+### Backend Connection
+
+The portfolio fetches web projects from the WordPress backend using WPGraphQL. The Work section displays projects from the `web_project` custom post type.
+
+**GraphQL Endpoint Configuration:**
+- Default: `http://localhost:10004/graphql` (for Local by Flywheel)
+- Set `VITE_WP_GRAPHQL_URL` in your `.env` file to point to your WordPress GraphQL endpoint
+- The endpoint should be: `https://your-site.com/graphql` for production
+
+**Available Data:**
+- Web Projects (displayed in Work section)
+  - Title, excerpt, featured image
+  - Technology stack
+  - Client, year
+  - Project URL, GitHub URL
+  - Screenshots gallery
+
+The app uses the `useWebProjects` hook from `src/hooks/useWordPressData.js` to fetch data from the backend.
+

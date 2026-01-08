@@ -4,6 +4,7 @@
  */
 
 // Update this URL to match your WordPress installation
+// Uses the same endpoint as the mishap-creative-works (skate UI) app
 const WP_GRAPHQL_URL = import.meta.env.VITE_WP_GRAPHQL_URL || 'http://localhost:10004/graphql';
 
 /**
@@ -50,6 +51,7 @@ export const GET_WEB_PROJECTS = `
         title
         slug
         excerpt
+        content
         date
         featuredImage {
           node {
