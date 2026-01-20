@@ -4,8 +4,10 @@
  */
 
 // Update this URL to match your WordPress installation
-// Uses the same endpoint as the mishap-creative-works (skate UI) app
-const WP_GRAPHQL_URL = import.meta.env.VITE_WP_GRAPHQL_URL || 'http://localhost:10004/graphql';
+// Local default points to the Local (Flywheel) site at portfolio-backend.local
+// Set VITE_WP_GRAPHQL_URL for production/staging endpoints.
+const WP_GRAPHQL_URL =
+  import.meta.env.VITE_WP_GRAPHQL_URL || 'http://portfolio-backend.local/graphql';
 
 /**
  * Execute a GraphQL query
@@ -68,6 +70,94 @@ export const GET_WEB_PROJECTS = `
           projectUrl
           githubUrl
           screenshots {
+            nodes {
+              sourceUrl
+              altText
+            }
+          }
+          contributionTypeTags
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+/**
+ * Fetch all repositories
+ */
+export const GET_REPOSITORIES = `
+  query GetRepositories($first: Int, $after: String) {
+    repositories(first: $first, after: $after) {
+      nodes {
+        id
+        title
+        slug
+        excerpt
+        content
+        date
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        repositoryDetails {
+          linkType
+          contributionMeta
+          repositoryUrl
+          siteUrl
+          platform
+          language
+          stars
+          contributionType
+          isFork
+          year
+          contributionTypeTags
+          customLogo {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+/**
+ * Fetch all design projects
+ */
+export const GET_DESIGN_PROJECTS = `
+  query GetDesignProjects($first: Int, $after: String) {
+    designProjects(first: $first, after: $after) {
+      nodes {
+        id
+        title
+        slug
+        excerpt
+        content
+        date
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        designProjectDetails {
+          category
+          client
+          year
+          projectUrl
+          gallery {
             nodes {
               sourceUrl
               altText

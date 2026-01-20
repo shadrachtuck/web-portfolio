@@ -31,13 +31,13 @@
     font-family: 'DS Terminal', monospace;
   }
   
-  /* Headers with green glow (outside hero) */
-  h1:not(.hero):not(.crt-content h1),
-  h2:not(.hero):not(.crt-content h2),
-  h3:not(.hero):not(.crt-content h3),
-  h4:not(.hero):not(.crt-content h4),
-  h5:not(.hero):not(.crt-content h5),
-  h6:not(.hero):not(.crt-content h6) {
+  /* Headers with green glow (outside hero and resume) */
+  h1:not(.hero):not(.crt-content h1):not(.resume-container h1):not(.resume-header h1),
+  h2:not(.hero):not(.crt-content h2):not(.resume-container h2):not(.resume-section-title),
+  h3:not(.hero):not(.crt-content h3):not(.resume-container h3):not(.resume-skill-category h3),
+  h4:not(.hero):not(.crt-content h4):not(.resume-container h4),
+  h5:not(.hero):not(.crt-content h5):not(.resume-container h5),
+  h6:not(.hero):not(.crt-content h6):not(.resume-container h6) {
     color: #12490d; /* Dark green for light mode */
     filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.5)) 
             drop-shadow(0 0 8px rgba(74, 222, 128, 0.3)) 
@@ -46,12 +46,12 @@
     letter-spacing: normal;
   }
   
-  .dark h1:not(.hero):not(.crt-content h1),
-  .dark h2:not(.hero):not(.crt-content h2),
-  .dark h3:not(.hero):not(.crt-content h3),
-  .dark h4:not(.hero):not(.crt-content h4),
-  .dark h5:not(.hero):not(.crt-content h5),
-  .dark h6:not(.hero):not(.crt-content h6) {
+  .dark h1:not(.hero):not(.crt-content h1):not(.resume-container h1):not(.resume-header h1),
+  .dark h2:not(.hero):not(.crt-content h2):not(.resume-container h2):not(.resume-section-title),
+  .dark h3:not(.hero):not(.crt-content h3):not(.resume-container h3):not(.resume-skill-category h3),
+  .dark h4:not(.hero):not(.crt-content h4):not(.resume-container h4),
+  .dark h5:not(.hero):not(.crt-content h5):not(.resume-container h5),
+  .dark h6:not(.hero):not(.crt-content h6):not(.resume-container h6) {
     color: #4ade80; /* Whitish green for dark mode */
     filter: drop-shadow(0 0 5px rgba(74, 222, 128, 0.7)) 
             drop-shadow(0 0 10px rgba(74, 222, 128, 0.5)) 
@@ -152,7 +152,7 @@
   }
 
   /* Apply DS Terminal font to buttons */
-  button, a[class*="px-6 py-3"], .resume-subtitle {
+  button, a[class*="px-6 py-3"] {
     font-family: 'DS Terminal', monospace;
   }
 }
@@ -212,6 +212,20 @@ section#work {
   color: #e4e4e7;
 }
 
+/* Override global heading styles for resume */
+.resume-container h1,
+.resume-container h2,
+.resume-container h3,
+.resume-container h4,
+.resume-container h5,
+.resume-container h6 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  color: inherit !important;
+  filter: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
 .resume-header {
   background: white;
   color: #333;
@@ -227,16 +241,33 @@ section#work {
   font-size: 32px;
   font-weight: bold;
   margin-bottom: 5px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  color: #333 !important;
+  filter: none !important;
+}
+
+.dark .resume-header h1 {
+  color: #e4e4e7 !important;
 }
 
 .resume-subtitle {
   font-size: 13px;
   margin-bottom: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  color: inherit !important;
+  filter: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
 }
 
 .resume-contact {
   font-size: 11px;
   line-height: 1.4;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  color: inherit !important;
+  filter: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
 }
 
 .resume-content {
@@ -259,10 +290,16 @@ section#work {
   border-bottom: 2px solid #2d3748;
   padding-bottom: 5px;
   margin-bottom: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  color: #333 !important;
+  filter: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
 }
 
 .dark .resume-section-title {
   border-bottom-color: #e4e4e7;
+  color: #e4e4e7 !important;
 }
 
 .resume-job {
@@ -331,6 +368,11 @@ section#work {
   font-weight: 600;
   font-size: 14px;
   margin-bottom: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  color: inherit !important;
+  filter: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
 }
 
 .resume-skill-category p {
@@ -1215,3 +1257,349 @@ section#work {
   pointer-events: none;
 }
 
+/* Print Styles */
+@media print {
+  /* Hide navigation, buttons, and other non-resume elements - be specific to avoid hiding containers */
+  nav,
+  .no-print,
+  button,
+  .square-button,
+  .green-button-glow,
+  .glitch-effect,
+  .theme-toggle-border,
+  .hero-section,
+  #work,
+  #about,
+  #contact,
+  section#work,
+  section#about,
+  section#contact,
+  section#hero {
+    display: none !important;
+  }
+
+  /* Hide the Navigation component */
+  header,
+  [class*="Navigation"] {
+    display: none !important;
+  }
+
+  /* Reset the resume section to print-friendly styles */
+  #resume {
+    display: block !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    box-shadow: none !important;
+    min-height: auto !important;
+    page-break-inside: avoid;
+  }
+
+  /* Remove all padding from section and wrapper divs - override Tailwind classes */
+  #resume,
+  section#resume {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+  }
+
+  /* Target all wrapper divs and motion divs - ensure they display */
+  #resume > div,
+  #resume > div > div,
+  #resume > div > div > div {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Override any Tailwind padding/margin classes */
+  #resume [class*="px-"],
+  #resume [class*="py-"],
+  #resume [class*="max-w-"],
+  #resume [class*="mx-auto"],
+  #resume [class*="mb-"],
+  #resume [class*="mt-"],
+  #resume [class*="gap-"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Remove animations and effects */
+  * {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Resume container print styles - ensure it displays */
+  .resume-container {
+    display: block !important;
+    background: white !important;
+    color: #000 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-inside: avoid;
+    width: 100% !important;
+    visibility: visible !important;
+  }
+
+  /* Resume header print styles - override the 30px 40px padding - ensure display */
+  .resume-header {
+    display: block !important;
+    background: white !important;
+    color: #000 !important;
+    padding: 0 !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+    page-break-inside: avoid !important;
+    visibility: visible !important;
+  }
+
+  .resume-header h1 {
+    color: #000 !important;
+    font-size: 28px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .resume-subtitle {
+    color: #333 !important;
+    font-size: 12px !important;
+  }
+
+  .resume-contact {
+    color: #333 !important;
+    font-size: 10px !important;
+  }
+
+  /* Resume content print styles - override the 30px 40px padding - ensure display */
+  .resume-content {
+    display: block !important;
+    padding: 0 !important;
+    background: white !important;
+    color: #000 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    visibility: visible !important;
+  }
+
+  .resume-summary {
+    color: #000 !important;
+    font-size: 12px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 20px !important;
+    margin-top: 0 !important;
+  }
+
+  /* Resume sections */
+  .resume-section {
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+
+  .resume-section-title {
+    color: #000 !important;
+    border-bottom: 2px solid #000 !important;
+    font-size: 18px !important;
+    padding-bottom: 4px !important;
+    margin-bottom: 12px !important;
+    page-break-after: avoid;
+  }
+
+  /* Resume jobs */
+  .resume-job {
+    margin-bottom: 18px !important;
+    page-break-inside: avoid;
+  }
+
+  .resume-job-title {
+    color: #000 !important;
+    font-size: 14px !important;
+  }
+
+  .resume-job-location {
+    color: #333 !important;
+    font-size: 12px !important;
+  }
+
+  .resume-job-date {
+    color: #000 !important;
+    font-size: 12px !important;
+  }
+
+  .resume-job ul,
+  .resume-section ul {
+    color: #000 !important;
+    font-size: 12px !important;
+    margin-left: 18px !important;
+  }
+
+  .resume-job ul li,
+  .resume-section ul li {
+    color: #000 !important;
+    margin-bottom: 4px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Skills grid - single column for print */
+  .resume-skills-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+
+  .resume-skill-category {
+    margin-bottom: 12px !important;
+    page-break-inside: avoid;
+  }
+
+  .resume-skill-category h3 {
+    color: #000 !important;
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .resume-skill-category p {
+    color: #000 !important;
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Education */
+  .resume-education-item {
+    margin-bottom: 15px !important;
+    page-break-inside: avoid;
+  }
+
+  .resume-education-title {
+    color: #000 !important;
+    font-size: 14px !important;
+  }
+
+  .resume-education-degree {
+    color: #333 !important;
+    font-size: 12px !important;
+  }
+
+  .resume-education-date {
+    color: #000 !important;
+    font-size: 12px !important;
+  }
+
+  .resume-education-description {
+    color: #000 !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Page breaks */
+  .resume-section:first-of-type {
+    page-break-before: auto;
+  }
+
+  /* Ensure proper spacing */
+  @page {
+    size: letter;
+    margin: 0.75in;
+  }
+
+  /* Force body and html to have no margins/padding */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Remove all wrapper spacing - target all possible wrapper classes - ensure display */
+  #resume > div,
+  #resume > div > div,
+  #resume .bg-white,
+  #resume .dark\:bg-zinc-900,
+  #resume [class*="bg-white"],
+  #resume [class*="bg-zinc"],
+  #resume [class*="shadow"],
+  #resume [class*="overflow"] {
+    display: block !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    max-width: 100% !important;
+  }
+
+  /* Remove any gaps between header and content */
+  .resume-container .resume-header {
+    margin-bottom: 0 !important;
+    padding-bottom: 10px !important;
+    padding-top: 0 !important;
+  }
+
+  .resume-container .resume-content {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Ensure no page break between header and content - remove page-break rules that cause issues */
+  .resume-header {
+    page-break-inside: avoid !important;
+  }
+
+  .resume-summary {
+    margin-top: 0 !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Ensure header and content flow together */
+  .resume-container {
+    display: block !important;
+  }
+
+  .resume-header + .resume-content {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Remove dark mode styles for print */
+  .dark .resume-container,
+  .dark .resume-header,
+  .dark .resume-content,
+  .dark .resume-section-title,
+  .dark .resume-job-title,
+  .dark .resume-job-date,
+  .dark .resume-education-title,
+  .dark .resume-education-date,
+  .dark .resume-skill-category h3 {
+    background: white !important;
+    color: #000 !important;
+    border-color: #000 !important;
+  }
+
+  .dark .resume-subtitle,
+  .dark .resume-contact,
+  .dark .resume-job-location,
+  .dark .resume-education-degree {
+    color: #333 !important;
+  }
+
+  .dark .resume-summary,
+  .dark .resume-job ul,
+  .dark .resume-section ul,
+  .dark .resume-job ul li,
+  .dark .resume-section ul li,
+  .dark .resume-skill-category p,
+  .dark .resume-education-description {
+    color: #000 !important;
+  }
+}

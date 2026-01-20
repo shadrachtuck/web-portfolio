@@ -1,21 +1,45 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef, useState } from "react";
-import { useWebProjects } from "../hooks/useWordPressData";
+import { useWebProjects, useDesignProjects } from "../hooks/useWordPressData";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-function ProjectCard({ project, index }) {
+function ProjectCard({ project, index, isDesignProject = false }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const details = project.webProjectDetails || {};
+  const details = project.webProjectDetails || project.designProjectDetails || {};
   const featuredImage = project.featuredImage?.node;
-  const galleryConnection = details.screenshots;
+  const galleryConnection = details.screenshots || details.gallery;
   const gallery = galleryConnection?.nodes || galleryConnection || [];
   const firstImage = gallery[0] || featuredImage;
   const techStack = details.techStack || [];
   const description = project.content || project.excerpt || "";
+  const contributionTypeTags = details.contributionTypeTags || [];
+  const category = details.category;
+  
+  const getContributionTypeTagLabel = (tag) => {
+    switch (tag) {
+      case "software_web":
+        return "Software/Web";
+      case "ux_ui_design":
+        return "UX/UI Design";
+      default:
+        return tag;
+    }
+  };
+
+  const getContributionTypeTagColor = (tag) => {
+    switch (tag) {
+      case "software_web":
+        return "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300";
+      case "ux_ui_design":
+        return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
+      default:
+        return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300";
+    }
+  };
 
   return (
     <motion.div
@@ -52,18 +76,35 @@ function ProjectCard({ project, index }) {
             <span className="text-sm text-zinc-500 dark:text-zinc-400">{details.year}</span>
           )}
         </div>
-        {techStack.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
-            {techStack.map((techItem, idx) => (
-              <span
-                key={idx}
-                className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-400"
+        <div className="flex flex-wrap gap-2 mb-2">
+          {techStack.length > 0 && techStack.map((techItem, idx) => (
+            <span
+              key={idx}
+              className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-400"
+            >
+              {techItem.tech || techItem}
+            </span>
+          ))}
+          {/* Design Project Category */}
+          {isDesignProject && category && (
+            <span 
+              className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium"
+            >
+              {category}
+            </span>
+          )}
+          {/* Contribution Type Tags */}
+          {contributionTypeTags && Array.isArray(contributionTypeTags) && contributionTypeTags.length > 0 && (
+            contributionTypeTags.map((tag, idx) => (
+              <span 
+                key={`tag-${idx}`}
+                className={`px-3 py-1 text-xs font-medium ${getContributionTypeTagColor(tag)}`}
               >
-                {techItem.tech || techItem}
+                {getContributionTypeTagLabel(tag)}
               </span>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
         
         {/* Collapsible Metadata */}
         {(description || techStack.length > 0) && (
@@ -160,7 +201,11 @@ function ProjectCard({ project, index }) {
 export function Work() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { projects, loading, error } = useWebProjects();
+  const { projects: webProjects, loading: webLoading, error: webError } = useWebProjects();
+  const { projects: designProjects, loading: designLoading, error: designError } = useDesignProjects();
+  
+  const loading = webLoading || designLoading;
+  const error = webError || designError;
 
   return (
     <section id="work" ref={ref} className="min-h-screen px-6 md:px-16 lg:px-24 py-10">
@@ -192,20 +237,58 @@ export function Work() {
         </div>
       )}
 
-      {!loading && !error && projects.length > 0 && (
-        <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
-          {projects.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
-          ))}
-        </div>
-      )}
+      {!loading && !error && (
+        <>
+          {/* Web Projects Section */}
+          {webProjects.length > 0 && (
+            <div className="mb-20">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="mb-12"
+              >
+                <h3 className="text-2xl md:text-3xl mb-4 text-zinc-800 dark:text-zinc-200">
+                  Software / Web Development
+                </h3>
+              </motion.div>
+              <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
+                {webProjects.map((project, index) => (
+                  <ProjectCard key={project.id} project={project} index={index} isDesignProject={false} />
+                ))}
+              </div>
+            </div>
+          )}
 
-      {!loading && !error && projects.length === 0 && (
-        <div className="flex items-center justify-center py-20">
-          <div className="text-zinc-600 dark:text-zinc-400">
-            No projects found. Check back soon!
-          </div>
-        </div>
+          {/* Design Projects Section */}
+          {designProjects.length > 0 && (
+            <div className="mt-20">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="mb-12"
+              >
+                <h3 className="text-2xl md:text-3xl mb-4 text-zinc-800 dark:text-zinc-200">
+                  UX/UI Design
+                </h3>
+              </motion.div>
+              <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
+                {designProjects.map((project, index) => (
+                  <ProjectCard key={project.id} project={project} index={index} isDesignProject={true} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {webProjects.length === 0 && designProjects.length === 0 && (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-zinc-600 dark:text-zinc-400">
+                No projects found. Check back soon!
+              </div>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

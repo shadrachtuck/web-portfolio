@@ -28,6 +28,13 @@ export function Resume() {
     }
   };
 
+  const handlePrint = () => {
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Resume.jsx:handlePrint',message:'Print button clicked',data:{resumeExists:!!document.getElementById('resume'),resumeDisplay:document.getElementById('resume')?.style.display,resumeVisibility:document.getElementById('resume')?.style.visibility,resumeChildren:document.getElementById('resume')?.children.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    window.print();
+  };
+
   return (
     <section id="resume" ref={ref} className="min-h-screen px-6 md:px-16 lg:px-24 py-10">
       <motion.div
@@ -36,20 +43,31 @@ export function Resume() {
         transition={{ duration: 0.8 }}
         className="max-w-5xl mx-auto"
       >
-        {/* Header with Download Button */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        {/* Header with Download and Print Buttons */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 no-print">
           <h2 className="text-4xl md:text-5xl lg:text-6xl">
             Resume
           </h2>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleDownloadPDF}
-            className="square-button green-button-glow flex items-center gap-2 px-3 md:px-5 py-1.5 md:py-2.5 border transition-all font-ds-terminal text-xs md:text-sm glitch-effect glitch-layers"
-            data-text="Download PDF"
-          >
-            <span>Download PDF</span>
-          </motion.button>
+          <div className="flex gap-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handlePrint}
+              className="square-button green-button-glow flex items-center gap-2 px-3 md:px-5 py-1.5 md:py-2.5 border transition-all font-ds-terminal text-xs md:text-sm glitch-effect glitch-layers"
+              data-text="Print Resume"
+            >
+              <span>Print Resume</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleDownloadPDF}
+              className="square-button green-button-glow flex items-center gap-2 px-3 md:px-5 py-1.5 md:py-2.5 border transition-all font-ds-terminal text-xs md:text-sm glitch-effect glitch-layers"
+              data-text="Download PDF"
+            >
+              <span>Download PDF</span>
+            </motion.button>
+          </div>
         </div>
 
         {/* Resume Content */}

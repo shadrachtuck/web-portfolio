@@ -53,7 +53,7 @@ The backend repository: https://github.com/shadrachtuck/portfolio-backend.git
 The portfolio fetches web projects from the WordPress backend using WPGraphQL. The Work section displays projects from the `web_project` custom post type.
 
 **GraphQL Endpoint Configuration:**
-- Default: `http://localhost:10004/graphql` (for Local by Flywheel)
+- Default: `http://portfolio-backend.local/graphql` (Local by Flywheel)
 - Set `VITE_WP_GRAPHQL_URL` in your `.env` file to point to your WordPress GraphQL endpoint
 - The endpoint should be: `https://your-site.com/graphql` for production
 

@@ -2,6 +2,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { Navigation } from "./components/Navigation";
 import { Hero } from "./components/Hero";
 import { Work } from "./components/Work";
+import { Repositories } from "./components/Repositories";
 import { About } from "./components/About";
 import { Resume } from "./components/Resume";
 import { Contact } from "./components/Contact";
@@ -13,6 +14,7 @@ function App() {
         <Navigation />
         <Hero />
         <Work />
+        <Repositories />
         <About />
         <Resume />
         <Contact />
@@ -22,4 +24,3 @@ function App() {
 }
 
 export default App;
-
