@@ -7,8 +7,19 @@
 // Production endpoint: https://backend.shadrach-tuck.dev/graphql
 // Local default: http://portfolio-backend.local/graphql
 // Set VITE_WP_GRAPHQL_URL environment variable to override
-const WP_GRAPHQL_URL =
-  import.meta.env.VITE_WP_GRAPHQL_URL || 'https://backend.shadrach-tuck.dev/graphql';
+
+// Force production URL - environment variable might be overriding with wrong value
+const envUrl = import.meta.env.VITE_WP_GRAPHQL_URL;
+const WP_GRAPHQL_URL = 
+  (envUrl && envUrl.trim() && !envUrl.includes('portfolio-backend.local')) 
+    ? envUrl.trim() 
+    : 'https://backend.shadrach-tuck.dev/graphql';
+
+// Debug: Log the actual URL being used
+if (typeof window !== 'undefined') {
+  console.log('GraphQL URL:', WP_GRAPHQL_URL);
+  console.log('Env var value:', envUrl);
+}
 
 /**
  * Execute a GraphQL query
