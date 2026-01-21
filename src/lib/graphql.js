@@ -4,15 +4,37 @@
  */
 
 // Update this URL to match your WordPress installation
-// Local default points to the Local (Flywheel) site at portfolio-backend.local
-// Set VITE_WP_GRAPHQL_URL for production/staging endpoints.
+// Production endpoint: https://backend.shadrach-tuck.dev/graphql
+// Local default: http://portfolio-backend.local/graphql
+// Set VITE_WP_GRAPHQL_URL environment variable to override
 const WP_GRAPHQL_URL =
-  import.meta.env.VITE_WP_GRAPHQL_URL || 'http://portfolio-backend.local/graphql';
+  import.meta.env.VITE_WP_GRAPHQL_URL || 'https://backend.shadrach-tuck.dev/graphql';
 
 /**
  * Execute a GraphQL query
  */
 export async function graphqlRequest(query, variables = {}) {
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId: 'debug-session',
+      runId: 'run1',
+      hypothesisId: 'H1',
+      location: 'portfolio-webdev/src/lib/graphql.js:graphqlRequest:entry',
+      message: 'graphqlRequest entry',
+      data: {
+        hasIntrospection: typeof query === 'string' && query.includes('__schema'),
+        querySample: typeof query === 'string' ? query.slice(0, 120) : 'non-string',
+        variablesSample: variables ? Object.keys(variables).slice(0, 5) : [],
+        endpoint: WP_GRAPHQL_URL,
+      },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+
   try {
     const response = await fetch(WP_GRAPHQL_URL, {
       method: 'POST',
@@ -25,11 +47,50 @@ export async function graphqlRequest(query, variables = {}) {
       }),
     });
 
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'H2',
+        location: 'portfolio-webdev/src/lib/graphql.js:graphqlRequest:response',
+        message: 'graphqlRequest response status',
+        data: {
+          status: response.status,
+          statusText: response.statusText,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+
     if (!response.ok) {
       throw new Error(`GraphQL request failed: ${response.statusText}`);
     }
 
     const data = await response.json();
+
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'H3',
+        location: 'portfolio-webdev/src/lib/graphql.js:graphqlRequest:post-parse',
+        message: 'graphqlRequest parsed payload',
+        data: {
+          hasErrors: !!data?.errors,
+          errorMessages: data?.errors ? data.errors.map((e) => e.message).slice(0, 3) : [],
+          keys: data ? Object.keys(data).slice(0, 5) : [],
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
 
     if (data.errors) {
       throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
@@ -37,6 +98,25 @@ export async function graphqlRequest(query, variables = {}) {
 
     return data.data;
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'H4',
+        location: 'portfolio-webdev/src/lib/graphql.js:graphqlRequest:catch',
+        message: 'graphqlRequest caught error',
+        data: {
+          message: error?.message,
+          stack: error?.stack ? error.stack.slice(0, 300) : '',
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+
     console.error('GraphQL request error:', error);
     throw error;
   }
