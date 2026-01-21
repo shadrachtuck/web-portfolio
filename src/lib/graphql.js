@@ -20,12 +20,23 @@ console.log('Type:', typeof import.meta.env.VITE_WP_GRAPHQL_URL);
 const WP_GRAPHQL_URL = 'https://backend.shadrach-tuck.dev/graphql';
 
 // #region agent log
-console.log('Final WP_GRAPHQL_URL:', WP_GRAPHQL_URL);
+console.log('=== GRAPHQL CONFIG LOADED ===');
+console.log('Hardcoded WP_GRAPHQL_URL:', WP_GRAPHQL_URL);
+console.log('File: graphql.js');
+console.log('Build timestamp check');
 // #endregion
 
 // Debug: Log the actual URL being used
 if (typeof window !== 'undefined') {
-  console.log('GraphQL URL (for requests):', WP_GRAPHQL_URL);
+  console.log('✅ GraphQL URL (for requests):', WP_GRAPHQL_URL);
+  console.log('✅ Should NOT see portfolio-backend.local');
+  // #region agent log
+  if (WP_GRAPHQL_URL.includes('portfolio-backend.local')) {
+    console.error('❌ ERROR: Still using old URL!', WP_GRAPHQL_URL);
+  } else {
+    console.log('✅ Correct URL:', WP_GRAPHQL_URL);
+  }
+  // #endregion
 }
 
 /**
