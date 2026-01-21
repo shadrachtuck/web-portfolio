@@ -6,35 +6,26 @@
 // Update this URL to match your WordPress installation
 // Production endpoint: https://backend.shadrach-tuck.dev/graphql
 // Local default: http://portfolio-backend.local/graphql
-// Set VITE_WP_GRAPHQL_URL environment variable to override
+// 
+// HARDCODED FOR PRODUCTION: Environment variable is being set incorrectly in Vercel
+// To use local development, temporarily change this value or use VITE_WP_GRAPHQL_URL
 
 // #region agent log
-fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'graphql.js:12','message':'Raw env var check',data:{rawEnvUrl:String(import.meta.env.VITE_WP_GRAPHQL_URL),envUrlType:typeof import.meta.env.VITE_WP_GRAPHQL_URL,envUrlTruthy:!!import.meta.env.VITE_WP_GRAPHQL_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+console.log('graphql.js loaded - checking env var');
+console.log('Raw VITE_WP_GRAPHQL_URL:', import.meta.env.VITE_WP_GRAPHQL_URL);
+console.log('Type:', typeof import.meta.env.VITE_WP_GRAPHQL_URL);
 // #endregion
 
-// Force production URL - environment variable might be overriding with wrong value
-const envUrl = import.meta.env.VITE_WP_GRAPHQL_URL;
+// Hardcode production URL - Vercel env var is causing issues
+const WP_GRAPHQL_URL = 'https://backend.shadrach-tuck.dev/graphql';
 
 // #region agent log
-fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'graphql.js:18','message':'Env var after assignment',data:{envUrl:String(envUrl),envUrlLength:envUrl?.length,containsLocal:envUrl?.includes('portfolio-backend.local'),isTruthy:!!envUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-// #endregion
-
-const WP_GRAPHQL_URL = 
-  (envUrl && envUrl.trim() && !envUrl.includes('portfolio-backend.local')) 
-    ? envUrl.trim() 
-    : 'https://backend.shadrach-tuck.dev/graphql';
-
-// #region agent log
-fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'graphql.js:26','message':'Final URL decision',data:{finalUrl:WP_GRAPHQL_URL,usedEnvVar:!!(envUrl && envUrl.trim() && !envUrl.includes('portfolio-backend.local')),fellBackToProduction:WP_GRAPHQL_URL === 'https://backend.shadrach-tuck.dev/graphql'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+console.log('Final WP_GRAPHQL_URL:', WP_GRAPHQL_URL);
 // #endregion
 
 // Debug: Log the actual URL being used
 if (typeof window !== 'undefined') {
-  console.log('GraphQL URL:', WP_GRAPHQL_URL);
-  console.log('Env var value:', envUrl);
-  // #region agent log
-  fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'graphql.js:34','message':'Console log confirmation',data:{wpGraphqlUrl:WP_GRAPHQL_URL,envUrl:envUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
+  console.log('GraphQL URL (for requests):', WP_GRAPHQL_URL);
 }
 
 /**
@@ -64,7 +55,7 @@ export async function graphqlRequest(query, variables = {}) {
 
   try {
     // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'graphql.js:52','message':'About to fetch GraphQL',data:{url:WP_GRAPHQL_URL,urlType:typeof WP_GRAPHQL_URL,isProduction:WP_GRAPHQL_URL.includes('backend.shadrach-tuck.dev'),isLocal:WP_GRAPHQL_URL.includes('portfolio-backend.local')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    console.log('Making GraphQL request to:', WP_GRAPHQL_URL);
     // #endregion
     
     const response = await fetch(WP_GRAPHQL_URL, {
