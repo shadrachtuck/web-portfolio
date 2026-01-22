@@ -130,7 +130,7 @@ export function Hero() {
 
   return (
     <>
-      <section ref={heroRef} className="flex flex-col items-center justify-center px-0 relative overflow-x-hidden hero-section min-h-screen">
+      <section ref={heroRef} className="flex flex-col items-center justify-center px-0 relative overflow-x-hidden hero-section min-h-screen pt-[150px] md:pt-[60px]">
         {/* Content Container */}
         <div className="w-full flex flex-col items-center relative mx-auto">
           {/* CRT Frame - Full Screen */}
@@ -185,7 +185,7 @@ export function Hero() {
                       <img 
                         src="/assets/img/head-shot-bit-map-dos.png" 
                         alt="Shadrach Tuck" 
-                        className="sm:w-[15%] h-auto max-w-full glitch-effect"
+                        className="w-[12%] sm:w-[15%] h-auto max-w-full glitch-effect"
                       />
                     </motion.div>
 
