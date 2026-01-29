@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef, useState } from "react";
-import { useRepositories } from "../hooks/useWordPressData";
+import { useRef, useState, useMemo } from "react";
+import { useRepositories, usePortfolioTags } from "../hooks/useWordPressData";
 import { ExternalLink, GitBranch, Star, Link as LinkIcon, Lock, Unlock, Folder, ChevronDown, ChevronUp } from "lucide-react";
 
 // Platform Logo Components
@@ -75,6 +75,7 @@ function RepositoryCard({ repository, index }) {
   // ACF image fields return as ConnectionEdge, so we access node directly
   const customLogo = details.customLogo?.node || details.customLogo;
   const contributionTypeTags = details.contributionTypeTags || [];
+  const portfolioTags = repository.portfolioTags?.nodes || [];
   
   const getContributionTypeTagLabel = (tag) => {
     switch (tag) {
@@ -243,6 +244,17 @@ function RepositoryCard({ repository, index }) {
                   ))}
                 </>
               )}
+              {/* Portfolio Tags */}
+              {portfolioTags && portfolioTags.length > 0 && (
+                portfolioTags.map((tag) => (
+                  <span 
+                    key={tag.id}
+                    className="text-xs px-2 py-1 rounded font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                  >
+                    {tag.name}
+                  </span>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -349,6 +361,26 @@ export function Repositories() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { repositories, loading, error } = useRepositories();
+  const { tags: portfolioTags, loading: tagsLoading } = usePortfolioTags();
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  // Filter repositories by selected tags
+  const filteredRepositories = useMemo(() => {
+    if (selectedTags.length === 0) return repositories;
+    return repositories.filter(repository => {
+      const repoTags = repository.portfolioTags?.nodes || [];
+      const repoTagSlugs = repoTags.map(tag => tag.slug);
+      return selectedTags.some(selectedSlug => repoTagSlugs.includes(selectedSlug));
+    });
+  }, [repositories, selectedTags]);
+
+  const toggleTag = (tagSlug) => {
+    setSelectedTags(prev => 
+      prev.includes(tagSlug) 
+        ? prev.filter(slug => slug !== tagSlug)
+        : [...prev, tagSlug]
+    );
+  };
 
   return (
     <section id="repositories" ref={ref} className="min-h-screen px-6 md:px-16 lg:px-24 py-10">
@@ -366,6 +398,42 @@ export function Repositories() {
         </p>
       </motion.div>
 
+      {/* Tag Filter */}
+      {!tagsLoading && portfolioTags.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mr-2">Filter by tag:</span>
+            {portfolioTags.map((tag) => (
+              <button
+                key={tag.id}
+                onClick={() => toggleTag(tag.slug)}
+                className={`px-4 py-2 text-sm font-medium rounded transition-all ${
+                  selectedTags.includes(tag.slug)
+                    ? 'bg-green-500 text-white dark:bg-green-600'
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                }`}
+              >
+                {tag.name}
+                {tag.count && <span className="ml-1 opacity-75">({tag.count})</span>}
+              </button>
+            ))}
+            {selectedTags.length > 0 && (
+              <button
+                onClick={() => setSelectedTags([])}
+                className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        </motion.div>
+      )}
+
       {loading && (
         <div className="flex items-center justify-center py-20">
           <div className="text-zinc-600 dark:text-zinc-400">Loading contributions...</div>
@@ -380,11 +448,19 @@ export function Repositories() {
         </div>
       )}
 
-      {!loading && !error && repositories.length > 0 && (
+      {!loading && !error && filteredRepositories.length > 0 && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
-          {repositories.map((repository, index) => (
+          {filteredRepositories.map((repository, index) => (
             <RepositoryCard key={repository.id} repository={repository} index={index} />
           ))}
+        </div>
+      )}
+
+      {!loading && !error && filteredRepositories.length === 0 && repositories.length > 0 && (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-zinc-600 dark:text-zinc-400">
+            No repositories match the selected filters.
+          </div>
         </div>
       )}
 

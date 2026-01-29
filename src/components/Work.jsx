@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef, useState } from "react";
-import { useWebProjects, useDesignProjects } from "../hooks/useWordPressData";
+import { useRef, useState, useMemo } from "react";
+import { useWebProjects, useDesignProjects, usePortfolioTags } from "../hooks/useWordPressData";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 function ProjectCard({ project, index, isDesignProject = false }) {
@@ -17,6 +17,7 @@ function ProjectCard({ project, index, isDesignProject = false }) {
   const techStack = details.techStack || [];
   const description = project.content || project.excerpt || "";
   const contributionTypeTags = details.contributionTypeTags || [];
+  const portfolioTags = project.portfolioTags?.nodes || [];
   const category = details.category;
   
   const getContributionTypeTagLabel = (tag) => {
@@ -101,6 +102,17 @@ function ProjectCard({ project, index, isDesignProject = false }) {
                 className={`px-3 py-1 text-xs font-medium ${getContributionTypeTagColor(tag)}`}
               >
                 {getContributionTypeTagLabel(tag)}
+              </span>
+            ))
+          )}
+          {/* Portfolio Tags */}
+          {portfolioTags && portfolioTags.length > 0 && (
+            portfolioTags.map((tag) => (
+              <span 
+                key={tag.id}
+                className="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+              >
+                {tag.name}
               </span>
             ))
           )}
@@ -203,9 +215,38 @@ export function Work() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { projects: webProjects, loading: webLoading, error: webError } = useWebProjects();
   const { projects: designProjects, loading: designLoading, error: designError } = useDesignProjects();
+  const { tags: portfolioTags, loading: tagsLoading } = usePortfolioTags();
+  const [selectedTags, setSelectedTags] = useState([]);
   
   const loading = webLoading || designLoading;
   const error = webError || designError;
+
+  // Filter projects by selected tags
+  const filteredWebProjects = useMemo(() => {
+    if (selectedTags.length === 0) return webProjects;
+    return webProjects.filter(project => {
+      const projectTags = project.portfolioTags?.nodes || [];
+      const projectTagSlugs = projectTags.map(tag => tag.slug);
+      return selectedTags.some(selectedSlug => projectTagSlugs.includes(selectedSlug));
+    });
+  }, [webProjects, selectedTags]);
+
+  const filteredDesignProjects = useMemo(() => {
+    if (selectedTags.length === 0) return designProjects;
+    return designProjects.filter(project => {
+      const projectTags = project.portfolioTags?.nodes || [];
+      const projectTagSlugs = projectTags.map(tag => tag.slug);
+      return selectedTags.some(selectedSlug => projectTagSlugs.includes(selectedSlug));
+    });
+  }, [designProjects, selectedTags]);
+
+  const toggleTag = (tagSlug) => {
+    setSelectedTags(prev => 
+      prev.includes(tagSlug) 
+        ? prev.filter(slug => slug !== tagSlug)
+        : [...prev, tagSlug]
+    );
+  };
 
   return (
     <section id="work" ref={ref} className="min-h-screen px-6 md:px-16 lg:px-24 py-10">
@@ -222,6 +263,42 @@ export function Work() {
           A curated collection of web development and software projects
         </p>
       </motion.div>
+
+      {/* Tag Filter */}
+      {!tagsLoading && portfolioTags.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mr-2">Filter by tag:</span>
+            {portfolioTags.map((tag) => (
+              <button
+                key={tag.id}
+                onClick={() => toggleTag(tag.slug)}
+                className={`px-4 py-2 text-sm font-medium rounded transition-all ${
+                  selectedTags.includes(tag.slug)
+                    ? 'bg-green-500 text-white dark:bg-green-600'
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                }`}
+              >
+                {tag.name}
+                {tag.count && <span className="ml-1 opacity-75">({tag.count})</span>}
+              </button>
+            ))}
+            {selectedTags.length > 0 && (
+              <button
+                onClick={() => setSelectedTags([])}
+                className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {loading && (
         <div className="flex items-center justify-center py-20">
@@ -240,7 +317,7 @@ export function Work() {
       {!loading && !error && (
         <>
           {/* Web Projects Section */}
-          {webProjects.length > 0 && (
+          {filteredWebProjects.length > 0 && (
             <div className="mb-20">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -253,7 +330,7 @@ export function Work() {
                 </h3>
               </motion.div>
               <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
-                {webProjects.map((project, index) => (
+                {filteredWebProjects.map((project, index) => (
                   <ProjectCard key={project.id} project={project} index={index} isDesignProject={false} />
                 ))}
               </div>
@@ -261,7 +338,7 @@ export function Work() {
           )}
 
           {/* Design Projects Section */}
-          {designProjects.length > 0 && (
+          {filteredDesignProjects.length > 0 && (
             <div className="mt-20">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -274,9 +351,17 @@ export function Work() {
                 </h3>
               </motion.div>
               <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
-                {designProjects.map((project, index) => (
+                {filteredDesignProjects.map((project, index) => (
                   <ProjectCard key={project.id} project={project} index={index} isDesignProject={true} />
                 ))}
+              </div>
+            </div>
+          )}
+
+          {filteredWebProjects.length === 0 && filteredDesignProjects.length === 0 && webProjects.length + designProjects.length > 0 && (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-zinc-600 dark:text-zinc-400">
+                No projects match the selected filters.
               </div>
             </div>
           )}
