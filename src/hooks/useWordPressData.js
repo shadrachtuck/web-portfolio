@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { graphqlRequest, GET_WEB_PROJECTS, GET_REPOSITORIES, GET_DESIGN_PROJECTS, GET_PORTFOLIO_TAGS, INTROSPECT_WEB_PROJECT } from "../lib/graphql.js";
-import { IS_DEVELOPMENT, WP_GRAPHQL_URL } from "../lib/config.js";
+import { graphqlRequest, GET_WEB_PROJECTS, GET_REPOSITORIES, GET_DESIGN_PROJECTS, GET_PORTFOLIO_TAGS } from "../lib/graphql.js";
 
 export function useWebProjects() {
   const [projects, setProjects] = useState([]);
@@ -13,33 +12,9 @@ export function useWebProjects() {
         setLoading(true);
         setError(null);
         
-        // Only run introspection in development (disabled in production for security)
-        // NEVER run introspection if using production URL - this is the most reliable check
-        const isProductionUrl = WP_GRAPHQL_URL.includes('shadrach-tuck.dev');
-        const shouldRunIntrospection = !isProductionUrl && IS_DEVELOPMENT;
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useWordPressData.js:17',message:'Introspection check',data:{isDevelopment:IS_DEVELOPMENT,wpGraphQLUrl:WP_GRAPHQL_URL,isProductionUrl:isProductionUrl,shouldRunIntrospection:shouldRunIntrospection},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
-        // #endregion
-        
-        // Skip introspection entirely if using production URL
-        if (shouldRunIntrospection) {
-          // #region agent log
-          fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useWordPressData.js:21',message:'Fetching WebProject introspection',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
-          // #endregion
-          
-          // First, introspect the WebProject type to see available fields
-          try {
-            const introspectionData = await graphqlRequest(INTROSPECT_WEB_PROJECT);
-            // #region agent log
-            fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useWordPressData.js:25',message:'WebProject introspection result',data:{typeName:introspectionData?.__type?.name,fields:introspectionData?.__type?.fields?.map(f=>f.name),hasPortfolioTags:introspectionData?.__type?.fields?.some(f=>f.name==='portfolioTags')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
-            // #endregion
-          } catch (introspectErr) {
-            // #region agent log
-            fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useWordPressData.js:29',message:'Introspection failed',data:{error:introspectErr.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
-            // #endregion
-          }
-        }
+        // Introspection disabled - was causing errors in production
+        // GraphQL introspection is not allowed for public requests by default
+        // If needed for debugging, enable it in WPGraphQL Settings on the WordPress backend
         
         const data = await graphqlRequest(GET_WEB_PROJECTS, { first: 100 });
         const fetchedProjects = data?.webProjects?.nodes || [];
