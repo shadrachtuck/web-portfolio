@@ -1,23 +1,5 @@
 import { motion } from "motion/react";
-import { useState, useEffect, useRef, useMemo, memo } from "react";
-
-// Memoized image component to prevent re-renders
-const HeadShotImage = memo(({ imageRef, imageSrc, onLoad, onError }) => {
-  return (
-    <img 
-      ref={imageRef}
-      src={imageSrc}
-      alt="Shadrach Tuck" 
-      className="w-[12%] sm:w-[15%] h-auto max-w-full glitch-effect"
-      loading="eager"
-      decoding="async"
-      onLoad={onLoad}
-      onError={onError}
-      key="head-shot-image-stable"
-    />
-  );
-});
-HeadShotImage.displayName = 'HeadShotImage';
+import { useState, useEffect, useRef, useMemo } from "react";
 
 export function Hero() {
   const [displayedText, setDisplayedText] = useState("");
@@ -26,45 +8,42 @@ export function Hero() {
   const [showContent, setShowContent] = useState(false);
   const [isPastHero, setIsPastHero] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const heroRef = useRef(null);
+  const imageLoadCountRef = useRef(0);
+  const imageSrc = "/assets/img/head-shot-bit-map-dos.png"; // Stable reference
+  const imageLoadedRef = useRef(false);
   const imageRef = useRef(null);
-  const imagePreloadedRef = useRef(false);
-  const imageSrcRef = useRef("/assets/img/head-shot-bit-map-dos.png");
   
-  // Preload image on component mount - only once
-  useEffect(() => {
-    if (imagePreloadedRef.current) return; // Already preloaded
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:20',message:'Image preload started',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A',timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
-    
-    const img = new Image();
-    img.src = imageSrcRef.current;
-    img.onload = () => {
-      if (!imagePreloadedRef.current) {
-        imagePreloadedRef.current = true;
-        setImageLoaded(true);
+  // Memoize the image element to prevent React from recreating it
+  const headShotImage = useMemo(() => (
+    <img 
+      ref={imageRef}
+      src={imageSrc}
+      alt="Shadrach Tuck" 
+      className="w-[12%] sm:w-[15%] h-auto max-w-full glitch-effect"
+      onLoad={(e) => {
+        // Only log the first load to prevent spam
+        if (!imageLoadedRef.current) {
+          imageLoadedRef.current = true;
+          imageLoadCountRef.current += 1;
+          // #region agent log
+          fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:img-onLoad',message:'Image onLoad fired (first time)',data:{loadCount:imageLoadCountRef.current,complete:e.target.complete},sessionId:'debug-session',runId:'run1',hypothesisId:'B',timestamp:Date.now()})}).catch(()=>{});
+          // #endregion
+        } else {
+          // Log subsequent loads (shouldn't happen)
+          imageLoadCountRef.current += 1;
+          // #region agent log
+          fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:img-onLoad',message:'Image onLoad fired (REPEATED)',data:{loadCount:imageLoadCountRef.current,complete:e.target.complete},sessionId:'debug-session',runId:'run1',hypothesisId:'C',timestamp:Date.now()})}).catch(()=>{});
+          // #endregion
+        }
+      }}
+      onError={(e) => {
         // #region agent log
-        fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:30',message:'Image preload completed',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A',timestamp:Date.now()})}).catch(()=>{});
+        fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:img-onError',message:'Image onError fired',data:{src:e.target.src},sessionId:'debug-session',runId:'run1',hypothesisId:'D',timestamp:Date.now()})}).catch(()=>{});
         // #endregion
-      }
-    };
-    img.onerror = () => {
-      console.error("Failed to load head shot image");
-      // #region agent log
-      fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:35',message:'Image preload failed',data:{timestamp:Date.now()},sessionId:'debug-session',runId:'run1',hypothesisId:'A',timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
-    };
-  }, []);
-  
-  // Track component renders
-  useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:45',message:'Hero component rendered',data:{showContent,imageLoaded,displayedTextLength:displayedText.length},sessionId:'debug-session',runId:'run1',hypothesisId:'B',timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
-  });
+      }}
+    />
+  ), []); // Empty dependency array - create once and never recreate
   
   const promptChar = ">";
   const fullText = "Hello world, I'm Shadrach Tuck!";
@@ -229,42 +208,17 @@ export function Hero() {
                   </h2>
                 </motion.div>
 
-                {/* Bitmap Image - Center - Always mounted to prevent re-requests */}
-                <motion.div
-                  initial={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
-                  animate={{ 
-                    opacity: showContent && imageLoaded ? 1 : 0, 
-                    clipPath: showContent ? "inset(0% 0% 0% 0%)" : "inset(0% 0% 100% 0%)"
-                  }}
-                  transition={{ duration: 0.6, delay: 0.6, ease: "easeIn" }}
+                {/* Bitmap Image - Center - Memoized to prevent React from recreating it */}
+                <div
                   className="flex justify-center glitch-effect items-center flex-shrink-0"
                   style={{ 
-                    visibility: showContent ? 'visible' : 'hidden', 
-                    height: showContent ? 'auto' : 0,
-                    pointerEvents: showContent ? 'auto' : 'none'
+                    visibility: showContent ? 'visible' : 'hidden',
+                    opacity: showContent ? 1 : 0,
+                    transition: 'opacity 0.6s ease-in 0.6s'
                   }}
                 >
-                  <HeadShotImage
-                    imageRef={imageRef}
-                    imageSrc={imageSrcRef.current}
-                    onLoad={(e) => {
-                      // #region agent log
-                      fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:215',message:'Image onLoad fired',data:{complete:e.target.complete,alreadyPreloaded:imagePreloadedRef.current},sessionId:'debug-session',runId:'run1',hypothesisId:'C',timestamp:Date.now()})}).catch(()=>{});
-                      // #endregion
-                      // Only set loaded state once, prevent multiple onLoad calls
-                      if (!imagePreloadedRef.current && e.target.complete) {
-                        imagePreloadedRef.current = true;
-                        setImageLoaded(true);
-                      }
-                    }}
-                    onError={() => {
-                      console.error("Failed to load head shot image");
-                      // #region agent log
-                      fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:225',message:'Image onError fired',data:{},sessionId:'debug-session',runId:'run1',hypothesisId:'D',timestamp:Date.now()})}).catch(()=>{});
-                      // #endregion
-                    }}
-                  />
-                </motion.div>
+                  {headShotImage}
+                </div>
 
                 {/* Subtitle - Right below image */}
                 {showContent && (
