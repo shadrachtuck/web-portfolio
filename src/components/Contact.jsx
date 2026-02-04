@@ -1,16 +1,43 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Mail, Linkedin, Github, MapPin, Phone } from "lucide-react";
+import { graphqlRequest, GET_SITE_SETTINGS } from "../lib/graphql.js";
 
 export function Contact() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [siteSettings, setSiteSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSiteSettings() {
+      try {
+        const data = await graphqlRequest(GET_SITE_SETTINGS);
+        // Handle different possible response structures
+        if (data?.acfOptions?.siteSettings) {
+          setSiteSettings(data.acfOptions.siteSettings);
+        } else if (data?.siteSettings) {
+          setSiteSettings(data.siteSettings);
+        }
+      } catch (error) {
+        console.error("Error fetching site settings:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSiteSettings();
+  }, []);
+
+  // Build socials array from backend data, with fallbacks
+  const email = siteSettings?.emailAddress || "shadrachtuck@gmail.com";
+  const githubUrl = siteSettings?.githubUrl || "#";
+  const linkedinUrl = siteSettings?.linkedinUrl || "#";
 
   const socials = [
-    { name: "Email", icon: Mail, href: "mailto:shadrachtuck@gmail.com" },
-    { name: "LinkedIn", icon: Linkedin, href: "#" },
-    { name: "GitHub", icon: Github, href: "#" },
+    { name: "Email", icon: Mail, href: `mailto:${email}` },
+    { name: "LinkedIn", icon: Linkedin, href: linkedinUrl },
+    { name: "GitHub", icon: Github, href: githubUrl },
   ];
 
   return (
@@ -40,10 +67,10 @@ export function Contact() {
                 Get in Touch
               </h3>
               <a
-                href="mailto:shadrachtuck@gmail.com"
+                href={`mailto:${email}`}
                 className="text-2xl md:text-3xl hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors inline-block mb-4 font-ds-terminal"
               >
-                shadrachtuck@gmail.com
+                {email}
               </a>
               <div className="space-y-2 text-zinc-600 dark:text-zinc-400">
                 <div className="flex items-center gap-2">

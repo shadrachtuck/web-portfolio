@@ -229,6 +229,24 @@ export const GET_PORTFOLIO_TAGS = `
 `;
 
 /**
+ * Fetch site settings (social links, etc.)
+ * Note: ACF field names are converted to camelCase in GraphQL
+ * github_url -> githubUrl, linkedin_url -> linkedinUrl, email_address -> emailAddress
+ * Options pages are accessed via acfOptions with the field group name
+ */
+export const GET_SITE_SETTINGS = `
+  query GetSiteSettings {
+    acfOptions {
+      siteSettings {
+        githubUrl
+        linkedinUrl
+        emailAddress
+      }
+    }
+  }
+`;
+
+/**
  * Introspect WebProject type to see available fields
  */
 export const INTROSPECT_WEB_PROJECT = `

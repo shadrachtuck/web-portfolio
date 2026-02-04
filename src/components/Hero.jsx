@@ -9,39 +9,14 @@ export function Hero() {
   const [isPastHero, setIsPastHero] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
   const heroRef = useRef(null);
-  const imageLoadCountRef = useRef(0);
-  const imageSrc = "/assets/img/head-shot-bit-map-dos.png"; // Stable reference
-  const imageLoadedRef = useRef(false);
-  const imageRef = useRef(null);
+  const imageSrc = "/assets/img/head-shot-bit-map-dos.png";
   
-  // Memoize the image element to prevent React from recreating it
+  // Memoize the image element to prevent React from recreating it on every render
   const headShotImage = useMemo(() => (
     <img 
-      ref={imageRef}
       src={imageSrc}
       alt="Shadrach Tuck" 
       className="w-[12%] sm:w-[15%] h-auto max-w-full glitch-effect"
-      onLoad={(e) => {
-        // Only log the first load to prevent spam
-        if (!imageLoadedRef.current) {
-          imageLoadedRef.current = true;
-          imageLoadCountRef.current += 1;
-          // #region agent log
-          fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:img-onLoad',message:'Image onLoad fired (first time)',data:{loadCount:imageLoadCountRef.current,complete:e.target.complete},sessionId:'debug-session',runId:'run1',hypothesisId:'B',timestamp:Date.now()})}).catch(()=>{});
-          // #endregion
-        } else {
-          // Log subsequent loads (shouldn't happen)
-          imageLoadCountRef.current += 1;
-          // #region agent log
-          fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:img-onLoad',message:'Image onLoad fired (REPEATED)',data:{loadCount:imageLoadCountRef.current,complete:e.target.complete},sessionId:'debug-session',runId:'run1',hypothesisId:'C',timestamp:Date.now()})}).catch(()=>{});
-          // #endregion
-        }
-      }}
-      onError={(e) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Hero.jsx:img-onError',message:'Image onError fired',data:{src:e.target.src},sessionId:'debug-session',runId:'run1',hypothesisId:'D',timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
-      }}
     />
   ), []); // Empty dependency array - create once and never recreate
   
@@ -191,12 +166,12 @@ export function Hero() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8 }}
-                  className="flex-shrink-0 sm:pt-2 p-4 md:p-4"
+                  className="flex-shrink-0 sm:pt-2 p-2 md:p-4 pl-4 md:pl-6 lg:pl-8"
                 >
                   <h2 
                     className="hero hero-text glitch-effect glitch-layers font-ds-terminal text-green-400"
                     data-text={`${promptChar} ${displayedText}${showCursor ? '_' : ''}`}
-                    style={{ fontSize: 'clamp(0.875rem, 2.5vw, 2.2rem)', letterSpacing: '0.05em' }}
+                    style={{ fontSize: 'clamp(1rem, 2.5vw, 2.2rem)', letterSpacing: '0.05em' }}
                   >
                     <span className="inline-flex items-baseline">
                       <span className="inline-block">{promptChar} </span>
@@ -226,13 +201,13 @@ export function Hero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="flex flex-col items-center flex-shrink-0 flex-grow py-4 md:py-6"
+                    className="flex flex-col items-center flex-shrink-0 flex-grow py-2 md:py-6"
                   >
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6}}
-                      className="hero-subtext text-green-400  text-center font-ds-terminal logo-glow-container w-full glitch-effect glitch-layers"
+                      className="hero-subtext text-green-400 text-center font-ds-terminal logo-glow-container w-full glitch-effect glitch-layers text-xs sm:text-base md:text-lg lg:text-xl"
                       data-text="Software Developer | Full-Stack Engineer | UX/UI Designer"
                     >
                       <span className="logo-glow">
