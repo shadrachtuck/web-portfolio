@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { graphqlRequest, GET_WEB_PROJECTS, GET_REPOSITORIES, GET_DESIGN_PROJECTS, GET_PORTFOLIO_TAGS } from "../lib/graphql.js";
+import { graphqlRequest, GET_WEB_PROJECTS, GET_REPOSITORIES, GET_DESIGN_PROJECTS, GET_PORTFOLIO_TAGS, GET_ABOUT_PAGE } from "../lib/graphql.js";
 
 export function useWebProjects() {
   const [projects, setProjects] = useState([]);
@@ -105,7 +105,9 @@ export function usePortfolioTags() {
         setLoading(true);
         setError(null);
         
-        const data = await graphqlRequest(GET_PORTFOLIO_TAGS);
+        // WPGraphQL connections default to 10 items if `first` isn’t provided.
+        // We fetch a larger set so UI can paginate client-side.
+        const data = await graphqlRequest(GET_PORTFOLIO_TAGS, { first: 200 });
         const fetchedTags = data?.portfolioTags?.nodes || [];
         setTags(fetchedTags);
         setLoading(false);
@@ -121,4 +123,32 @@ export function usePortfolioTags() {
   }, []);
 
   return { tags, loading, error };
+}
+
+export function useAboutPage(uri = "about") {
+  const [aboutPage, setAboutPage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchAboutPage() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await graphqlRequest(GET_ABOUT_PAGE, { uri });
+        setAboutPage(data?.pageBy || null);
+      } catch (err) {
+        console.error("Error fetching about page:", err);
+        setError(err.message || "Failed to load about page");
+        setAboutPage(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAboutPage();
+  }, [uri]);
+
+  return { aboutPage, loading, error };
 }

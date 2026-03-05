@@ -216,13 +216,17 @@ export const GET_DESIGN_PROJECTS = `
  * Fetch all portfolio tags
  */
 export const GET_PORTFOLIO_TAGS = `
-  query GetPortfolioTags {
-    portfolioTags {
+  query GetPortfolioTags($first: Int) {
+    portfolioTags(first: $first) {
       nodes {
         id
         name
         slug
         count
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
       }
     }
   }
@@ -236,11 +240,33 @@ export const GET_PORTFOLIO_TAGS = `
  */
 export const GET_SITE_SETTINGS = `
   query GetSiteSettings {
-    acfOptions {
-      siteSettings {
-        githubUrl
-        linkedinUrl
-        emailAddress
+    siteSettings {
+      githubUrl
+      linkedinUrl
+      emailAddress
+      resumePdfUrl
+      resumePdfDownloadUrl
+    }
+  }
+`;
+
+/**
+ * Fetch About page content + ACF fields by URI
+ */
+export const GET_ABOUT_PAGE = `
+  query GetAboutPage($uri: String!) {
+    pageBy(uri: $uri) {
+      id
+      title
+      content
+      aboutPageDetails {
+        bio
+        experience {
+          title
+          company
+          startYear
+          endYear
+        }
       }
     }
   }

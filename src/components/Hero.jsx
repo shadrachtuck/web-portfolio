@@ -8,6 +8,7 @@ export function Hero() {
   const [showContent, setShowContent] = useState(false);
   const [isPastHero, setIsPastHero] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const heroRef = useRef(null);
   const imageSrc = "/assets/img/head-shot-bit-map-dos.png";
   
@@ -263,19 +264,19 @@ export function Hero() {
         </div>
       </section>
 
-      {/* Floating Navigation Arrows - Right Side */}
+      {/* Floating Navigation Arrows - Right Side (md+ only, same breakpoint as instructions) */}
       {isPastHero && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 20 }}
-          className="fixed right-8 bottom-8 md:top-1/2 md:-translate-y-1/2 md:bottom-auto z-[150] flex flex-col gap-4 items-end"
+          className="hidden md:flex fixed right-8 top-1/2 -translate-y-1/2 z-[150] flex-col gap-4 items-end"
         >
           <motion.button
             onClick={scrollToPrevious}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="cursor-pointer project-card-border bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-3 md:p-4 flex items-center justify-center w-16 h-16 md:w-20 md:h-20 relative"
+            className="cursor-pointer project-card-border bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-2 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 relative"
             aria-label="Scroll to previous section"
           >
             <motion.div
@@ -283,7 +284,7 @@ export function Hero() {
               transition={{ duration: 1.5, repeat: Infinity }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <span className="arrow-btn-icon-up md:text-6xl font-ds-terminal header-style leading-none">v</span>
+              <span className="arrow-btn-icon-up text-4xl md:text-5xl font-ds-terminal header-style leading-none">v</span>
             </motion.div>
           </motion.button>
           <span className="text-xs font-ds-terminal text-[#12490d] dark:text-green-400">Jump to section</span>
@@ -306,7 +307,7 @@ export function Hero() {
               onClick={scrollToNext}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="cursor-pointer project-card-border bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-3 md:p-4 flex items-center justify-center w-16 h-16 md:w-20 md:h-20 relative"
+              className="cursor-pointer project-card-border bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-2 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 relative"
               aria-label="Scroll to next section"
             >
               <motion.div
@@ -314,15 +315,26 @@ export function Hero() {
                 transition={{ duration: 1.5, repeat: Infinity }}
                 className="absolute inset-0 flex items-center justify-center"
               >
-                <span className="arrow-btn-icon-down md:text-6xl font-ds-terminal header-style leading-none">v</span>
+                <span className="arrow-btn-icon-down text-4xl md:text-5xl font-ds-terminal header-style leading-none">v</span>
               </motion.div>
             </motion.button>
           )}
+
+          {/* Question mark - toggle keyboard instructions (round) */}
+          <motion.button
+            onClick={() => setShowKeyboardHelp((v) => !v)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="cursor-pointer rounded-full project-card-border bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md w-10 h-10 flex items-center justify-center font-ds-terminal text-lg text-[#12490d] dark:text-green-400"
+            aria-label={showKeyboardHelp ? "Hide keyboard shortcuts" : "Show keyboard shortcuts"}
+          >
+            ?
+          </motion.button>
         </motion.div>
       )}
 
-      {/* Keyboard Shortcut Instructions - Bottom of Screen */}
-      {isPastHero && (
+      {/* Keyboard Shortcut Instructions - Bottom of Screen (only when ? clicked, same breakpoint as nav) */}
+      {isPastHero && showKeyboardHelp && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

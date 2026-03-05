@@ -1,37 +1,56 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { graphqlRequest, GET_SITE_SETTINGS } from "../lib/graphql.js";
 
 export function Resume() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [resumePdfDownloadUrl, setResumePdfDownloadUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchResumePdfUrl() {
+      try {
+        const data = await graphqlRequest(GET_SITE_SETTINGS);
+        // Prefer the backend proxy endpoint (forces attachment download + avoids CORS)
+        const dlUrl = data?.siteSettings?.resumePdfDownloadUrl;
+        const validUrl = dlUrl && dlUrl.trim() !== "" ? dlUrl : null;
+        setResumePdfDownloadUrl(validUrl);
+      } catch (error) {
+        console.error("Error fetching resume PDF URL:", error);
+        setResumePdfDownloadUrl(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchResumePdfUrl();
+  }, []);
 
   const handleDownloadPDF = async () => {
-    try {
-      // Check if the PDF file exists
-      const response = await fetch('/resume.pdf', { method: 'HEAD' });
-      
-      if (!response.ok) {
-        throw new Error('PDF file not found');
-      }
+    // Only proceed if we have a valid PDF URL from the upload
+    if (!resumePdfDownloadUrl || resumePdfDownloadUrl.trim() === "") {
+      alert('No resume PDF has been uploaded. Please upload a resume PDF in WordPress Site Settings.');
+      return;
+    }
 
-      // Create a link to download the PDF
+    try {
       const link = document.createElement('a');
-      link.href = '/resume.pdf';
-      link.download = 'Shadrach_Tuck_Resume.pdf';
+      // This endpoint is served by WP and responds with Content-Disposition: attachment
+      link.href = resumePdfDownloadUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       console.error('Error downloading PDF:', error);
-      alert('PDF file not found. Please ensure resume.pdf is placed in the public folder.');
+      alert('Error downloading PDF. Please check that the file is uploaded correctly in WordPress Site Settings.');
     }
   };
 
   const handlePrint = () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Resume.jsx:handlePrint',message:'Print button clicked',data:{resumeExists:!!document.getElementById('resume'),resumeDisplay:document.getElementById('resume')?.style.display,resumeVisibility:document.getElementById('resume')?.style.visibility,resumeChildren:document.getElementById('resume')?.children.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     window.print();
   };
 
@@ -90,7 +109,7 @@ export function Resume() {
             
             <div className="resume-content">
               <div className="resume-summary">
-                Software developer with over 5 years of professional experience building scalable, user-centric applications across diverse technology stacks. Expertise in full-stack development with C#/.NET, React, Vue.js, and modern JavaScript frameworks. Proven track record of enhancing application usability through RESTful APIs, microservices architecture, and responsive UI design. Skilled in Agile methodologies, automated testing, and cross-functional team leadership. Passionate about creating intuitive user experiences while maintaining clean, efficient, and maintainable code.
+                Software developer with over 7 years of professional experience building scalable, user-centric applications across diverse technology stacks. Expertise in full-stack development with C#/.NET, React, Vue.js, and other modern front and backend frameworks. Proven track record of enhancing application usability through RESTful APIs, microservices architecture, and responsive UI design. Skilled in Agile methodologies, automated testing, and cross-functional team leadership. Passionate about creating intuitive user experiences while maintaining clean, efficient, and maintainable code.
               </div>
               
               <div className="resume-section">

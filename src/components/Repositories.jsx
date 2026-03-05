@@ -99,10 +99,10 @@ function RepositoryCard({ repository, index }) {
     }
   };
   
-  // Debug logging to help identify the issue
-  if (process.env.NODE_ENV === 'development' && contributionMetaRaw) {
-    console.log(`[${repository.title}] Contribution Meta - Raw:`, contributionMetaRaw, 'Processed:', contributionMeta, 'All details:', details);
-  }
+  // // Debug logging to help identify the issue
+  // if (process.env.NODE_ENV === 'development' && contributionMetaRaw) {
+  //   console.log(`[${repository.title}] Contribution Meta - Raw:`, contributionMetaRaw, 'Processed:', contributionMeta, 'All details:', details);
+  // }
   
   const getContributionMetaLabel = () => {
     // Normalize the value to handle any case or whitespace issues

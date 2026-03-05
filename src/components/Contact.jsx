@@ -14,10 +14,8 @@ export function Contact() {
     async function fetchSiteSettings() {
       try {
         const data = await graphqlRequest(GET_SITE_SETTINGS);
-        // Handle different possible response structures
-        if (data?.acfOptions?.siteSettings) {
-          setSiteSettings(data.acfOptions.siteSettings);
-        } else if (data?.siteSettings) {
+        // Get site settings from RootQuery
+        if (data?.siteSettings) {
           setSiteSettings(data.siteSettings);
         }
       } catch (error) {

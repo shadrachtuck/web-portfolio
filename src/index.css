@@ -188,6 +188,14 @@ body {
   font-size: 4rem;
   margin-bottom: 1rem;
 }
+.arrow-btn-icon-left {
+  font-size: 2.5rem;
+  transform: rotate(90deg);
+}
+.arrow-btn-icon-right {
+  font-size: 2.5rem;
+  transform: rotate(-90deg);
+}
 
 /* Ensure other sections appear below hero and don't overlap */
 section:not(.hero-section) {
@@ -1298,10 +1306,12 @@ section#work {
   #work,
   #about,
   #contact,
+  #repositories,
   section#work,
   section#about,
   section#contact,
-  section#hero {
+  section#hero,
+  section#repositories {
     display: none !important;
   }
 
@@ -1309,6 +1319,22 @@ section#work {
   header,
   [class*="Navigation"] {
     display: none !important;
+  }
+
+  /* Hide fixed-positioned elements (like "Jump to section" navigation) - exclude resume content */
+  [class*="fixed"]:not(#resume):not(#resume *) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: static !important;
+  }
+  
+  /* Specifically target the navigation arrows container */
+  [class*="fixed"][class*="right-8"][class*="bottom-8"],
+  [class*="fixed"][class*="right-8"][class*="top-1/2"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
   }
 
   /* Reset the resume section to print-friendly styles */
@@ -1323,7 +1349,7 @@ section#work {
     background: white !important;
     box-shadow: none !important;
     min-height: auto !important;
-    page-break-inside: avoid;
+    page-break-inside: auto !important;
   }
 
   /* Remove all padding from section and wrapper divs - override Tailwind classes */
@@ -1334,15 +1360,26 @@ section#work {
     min-height: auto !important;
   }
 
-  /* Target all wrapper divs and motion divs - ensure they display */
+  /* Target all wrapper divs and motion divs - ensure they display and don't cause page breaks */
   #resume > div,
-  #resume > div > div,
-  #resume > div > div > div {
+  #resume > div > div {
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
     max-width: 100% !important;
     width: 100% !important;
+    page-break-inside: auto !important;
+  }
+
+  /* Hide the header div with "Resume" title and buttons - ensure it's completely hidden */
+  #resume .no-print,
+  #resume > div > .no-print {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
   }
 
   /* Override any Tailwind padding/margin classes */
@@ -1377,7 +1414,7 @@ section#work {
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    page-break-inside: avoid;
+    page-break-inside: auto !important;
     width: 100% !important;
     visibility: visible !important;
   }
@@ -1391,7 +1428,8 @@ section#work {
     padding-bottom: 8px !important;
     margin-bottom: 0 !important;
     margin-top: 0 !important;
-    page-break-inside: avoid !important;
+    page-break-inside: auto !important;
+    page-break-after: avoid !important;
     visibility: visible !important;
   }
 
@@ -1433,7 +1471,7 @@ section#work {
   /* Resume sections */
   .resume-section {
     margin-bottom: 20px !important;
-    page-break-inside: avoid;
+    page-break-inside: auto !important;
   }
 
   .resume-section-title {
@@ -1442,13 +1480,22 @@ section#work {
     font-size: 18px !important;
     padding-bottom: 4px !important;
     margin-bottom: 12px !important;
-    page-break-after: avoid;
+    page-break-after: auto !important;
   }
 
-  /* Resume jobs */
+  /* Resume jobs - allow breaks but try to keep job header with first bullet */
   .resume-job {
     margin-bottom: 18px !important;
-    page-break-inside: avoid;
+    page-break-inside: auto !important;
+  }
+  
+  /* Keep job header with at least first item */
+  .resume-job-header {
+    page-break-after: avoid !important;
+  }
+  
+  .resume-job-header + ul {
+    page-break-before: avoid !important;
   }
 
   .resume-job-title {
@@ -1488,7 +1535,7 @@ section#work {
 
   .resume-skill-category {
     margin-bottom: 12px !important;
-    page-break-inside: avoid;
+    page-break-inside: auto !important;
   }
 
   .resume-skill-category h3 {
@@ -1506,7 +1553,7 @@ section#work {
   /* Education */
   .resume-education-item {
     margin-bottom: 15px !important;
-    page-break-inside: avoid;
+    page-break-inside: auto !important;
   }
 
   .resume-education-title {
@@ -1530,9 +1577,26 @@ section#work {
     line-height: 1.5 !important;
   }
 
-  /* Page breaks */
+  /* Page breaks - allow natural breaks everywhere */
   .resume-section:first-of-type {
-    page-break-before: auto;
+    page-break-before: auto !important;
+  }
+  
+  /* Prevent large gaps by allowing breaks in all sections */
+  .resume-section {
+    orphans: 2 !important;
+    widows: 2 !important;
+  }
+  
+  /* Allow breaks in job lists to prevent large gaps */
+  .resume-job ul {
+    page-break-inside: auto !important;
+  }
+  
+  .resume-job ul li {
+    page-break-inside: auto !important;
+    orphans: 2 !important;
+    widows: 2 !important;
   }
 
   /* Ensure proper spacing */
@@ -1578,14 +1642,15 @@ section#work {
     padding-top: 0 !important;
   }
 
-  /* Ensure no page break between header and content - remove page-break rules that cause issues */
+  /* Ensure no page break between header and content - allow natural breaks */
   .resume-header {
-    page-break-inside: avoid !important;
+    page-break-inside: auto !important;
+    page-break-after: avoid !important;
   }
 
   .resume-summary {
     margin-top: 0 !important;
-    page-break-inside: avoid !important;
+    page-break-inside: auto !important;
   }
 
   /* Ensure header and content flow together */
