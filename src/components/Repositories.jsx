@@ -65,16 +65,16 @@ function RepositoryCard({ repository, index }) {
   const details = repository.repositoryDetails || {};
   const featuredImage = repository.featuredImage?.node;
   const description = repository.content || repository.excerpt || "";
-  const linkType = details.linkType || "repository";
+  const linkType = details.linkType || details.linktype || "repository";
   const isRepository = linkType === "repository";
   const platform = details.platform || "github";
-  // Handle both camelCase and snake_case field names from GraphQL
-  // Also handle potential string/number conversion issues
-  const contributionMetaRaw = details.contributionMeta || details.contribution_meta;
+  // Handle both camelCase and lowercase ACF field names from GraphQL
+  const contributionMetaRaw = details.contributionMeta || details.contributionmeta || details.contribution_meta;
   const contributionMeta = contributionMetaRaw ? String(contributionMetaRaw).toLowerCase().trim() : "public_repo";
   // ACF image fields return as ConnectionEdge, so we access node directly
-  const customLogo = details.customLogo?.node || details.customLogo;
-  const contributionTypeTags = details.contributionTypeTags || [];
+  const customLogo = details.customLogo?.node || details.customLogo || details.customlogo?.node || details.customlogo;
+  const contributionTypeTagNodes = details.contributionTypeTags?.nodes || [];
+  const contributionTypeTags = contributionTypeTagNodes.map((n) => (typeof n === "string" ? n : n.slug));
   const portfolioTags = repository.portfolioTags?.nodes || [];
   
   const getContributionTypeTagLabel = (tag) => {
@@ -204,7 +204,7 @@ function RepositoryCard({ repository, index }) {
                   </div>
                 )}
                 <h3 className="text-xl md:text-2xl font-semibold">{repository.title}</h3>
-                {isRepository && details.isFork && (
+                {isRepository && (details.isFork || details.isfork) && (
                   <span className="text-xs px-2 py-1 bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400">
                     Fork
                   </span>
@@ -215,11 +215,11 @@ function RepositoryCard({ repository, index }) {
               )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {isRepository && details.contributionType && (
-                <span className="text-sm text-zinc-500 dark:text-zinc-400 capitalize">
-                  {details.contributionType.replace("_", " ")}
-                </span>
-              )}
+                {isRepository && (details.contributionType || details.contributiontype) && (
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400 capitalize">
+                    {(details.contributionType || details.contributiontype).replace("_", " ")}
+                  </span>
+                )}
               {/* Platform tag for repositories */}
               {isRepository && (
                 <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded font-medium text-white ${platformColors[platform] || platformColors.other}`}>
@@ -324,11 +324,11 @@ function RepositoryCard({ repository, index }) {
           />
         )}
 
-        {(details.repositoryUrl || details.siteUrl) && (
+        {(details.repositoryUrl || details.repositoryurl || details.siteUrl || details.siteurl) && (
           <div className="flex flex-wrap gap-3 pt-2">
-            {details.repositoryUrl && (
+            {(details.repositoryUrl || details.repositoryurl) && (
               <a
-                href={details.repositoryUrl}
+                href={details.repositoryUrl || details.repositoryurl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
@@ -338,9 +338,9 @@ function RepositoryCard({ repository, index }) {
                 View Repository
               </a>
             )}
-            {details.siteUrl && (
+            {(details.siteUrl || details.siteurl) && (
               <a
-                href={details.siteUrl}
+                href={details.siteUrl || details.siteurl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"

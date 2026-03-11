@@ -136,14 +136,14 @@ export const GET_REPOSITORIES = `
           }
         }
         repositoryDetails {
-          linkType
-          contributionMeta
-          repositoryUrl
-          siteUrl
+          linktype
+          contributionmeta
+          repositoryurl
+          siteurl
           platform
           language
           stars
-          contributionType
+          contributiontype
           isFork
           year
           contributionTypeTags {
@@ -153,7 +153,7 @@ export const GET_REPOSITORIES = `
               slug
             }
           }
-          customLogo {
+          customlogo {
             node {
               sourceUrl
               altText
