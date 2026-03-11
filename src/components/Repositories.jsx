@@ -73,6 +73,7 @@ function RepositoryCard({ repository, index }) {
   const contributionMeta = contributionMetaRaw ? String(contributionMetaRaw).toLowerCase().trim() : "public_repo";
   // ACF image fields return as ConnectionEdge, so we access node directly
   const customLogo = details.customLogo?.node || details.customLogo || details.customlogo?.node || details.customlogo;
+  const isFork = details.isFork === true || details.isFork === 1 || details.isfork === true || details.isfork === 1;
   const contributionTypeTagNodes = details.contributionTypeTags?.nodes || [];
   const contributionTypeTags = contributionTypeTagNodes.map((n) => (typeof n === "string" ? n : n.slug));
   const portfolioTags = repository.portfolioTags?.nodes || [];
@@ -169,14 +170,6 @@ function RepositoryCard({ repository, index }) {
     }
   };
 
-  const platformColors = {
-    github: "bg-zinc-800 dark:bg-zinc-700",
-    gitlab: "bg-orange-600 dark:bg-orange-700",
-    bitbucket: "bg-blue-600 dark:bg-blue-700",
-    azure: "bg-blue-500 dark:bg-blue-600",
-    other: "bg-zinc-600 dark:bg-zinc-700",
-  };
-
   return (
     <motion.div
       ref={ref}
@@ -204,7 +197,7 @@ function RepositoryCard({ repository, index }) {
                   </div>
                 )}
                 <h3 className="text-xl md:text-2xl font-semibold">{repository.title}</h3>
-                {isRepository && (details.isFork || details.isfork) && (
+                {isRepository && isFork && (
                   <span className="text-xs px-2 py-1 bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400">
                     Fork
                   </span>
@@ -220,13 +213,6 @@ function RepositoryCard({ repository, index }) {
                     {(details.contributionType || details.contributiontype).replace("_", " ")}
                   </span>
                 )}
-              {/* Platform tag for repositories */}
-              {isRepository && (
-                <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded font-medium text-white ${platformColors[platform] || platformColors.other}`}>
-                  <PlatformIcon platform={platform} isRepository={true} className="w-3.5 h-3.5" />
-                  <span>{platform === "azure" ? "Azure" : platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
-                </span>
-              )}
               <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded font-medium ${getContributionMetaColor()}`}>
                 {getContributionMetaIcon()}
                 <span>{getContributionMetaLabel()}</span>
