@@ -20,6 +20,8 @@ export function About() {
     return "";
   }, [aboutPage]);
 
+  const featuredImageUrl = aboutPage?.featuredImage?.node?.sourceUrl;
+
   const experienceItems = useMemo(() => {
     const fromWp = aboutPage?.aboutPageDetails?.experience;
     if (Array.isArray(fromWp) && fromWp.length > 0) return fromWp;
@@ -53,19 +55,39 @@ export function About() {
 
   return (
     <section id="about" ref={ref} className="min-h-screen flex items-center px-6 md:px-16 lg:px-24 py-10">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-stretch">
+        {/* Left: Featured image (B&W, full height) - matches hardcoded layout */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={isInView ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 0.8 }}
+          className="relative min-h-[300px] md:min-h-[500px] overflow-hidden"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl mb-8">
+          {featuredImageUrl ? (
+            <img
+              src={featuredImageUrl}
+              alt={aboutPage?.featuredImage?.node?.altText || "About me"}
+              className="absolute inset-0 w-full h-full object-cover grayscale"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-zinc-200 dark:bg-zinc-800" aria-hidden="true" />
+          )}
+        </motion.div>
+
+        {/* Right: About Me title, bio, button, Skills, Experience */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="flex flex-col"
+        >
+          <h2 className="text-4xl md:text-5xl lg:text-6xl mb-6">
             About Me
           </h2>
-          <div className="space-y-4 text-zinc-600 dark:text-zinc-400">
+          <div className="space-y-4 text-zinc-600 dark:text-zinc-400 flex-1">
             {bioHtml ? (
               <div
-                className="space-y-4"
+                className="space-y-4 [&_a]:text-zinc-600 [&_a]:dark:text-zinc-400 [&_a]:underline hover:[&_a]:text-zinc-800 dark:hover:[&_a]:text-zinc-200"
                 dangerouslySetInnerHTML={{ __html: bioHtml }}
               />
             ) : (
@@ -90,7 +112,7 @@ export function About() {
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.6 }}
-              className="mt-8"
+              className="mt-6 mb-8"
             >
               <a
                 href="#resume"
@@ -101,13 +123,7 @@ export function About() {
               </a>
             </motion.div>
           </div>
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
           <div className="space-y-6">
             <div>
               <div className="flex items-center justify-between gap-4 mb-4">
@@ -185,9 +201,9 @@ export function About() {
                   const years = [start, end].filter(Boolean).join(" - ");
 
                   return (
-                    <div key={`${title}-${company}-${idx}`}>
+                    <div key={`${title}-${company}-${idx}`} className="space-y-0.5">
                       <div className="flex justify-between items-baseline gap-4">
-                        <p className="font-semibold">{title}</p>
+                        <p className="font-semibold text-zinc-700 dark:text-zinc-300">{title}</p>
                         {years && (
                           <p className="text-sm text-zinc-500 dark:text-zinc-400 whitespace-nowrap">{years}</p>
                         )}
@@ -206,4 +222,5 @@ export function About() {
     </section>
   );
 }
+
 

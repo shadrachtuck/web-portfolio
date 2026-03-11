@@ -277,6 +277,12 @@ export const GET_ABOUT_PAGE = `
       id
       title
       content
+      featuredImage {
+        node {
+          sourceUrl
+          altText
+        }
+      }
       aboutPageDetails {
         bio
         experience {
