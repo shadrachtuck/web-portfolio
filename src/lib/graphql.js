@@ -84,15 +84,21 @@ export const GET_WEB_PROJECTS = `
           }
           client
           year
-          projectUrl
-          githubUrl
+          projecturl
+          githuburl
           screenshots {
             nodes {
               sourceUrl
               altText
             }
           }
-          contributionTypeTags
+          contributionTypeTags {
+            nodes {
+              id
+              name
+              slug
+            }
+          }
         }
         portfolioTags {
           nodes {
@@ -140,7 +146,13 @@ export const GET_REPOSITORIES = `
           contributionType
           isFork
           year
-          contributionTypeTags
+          contributionTypeTags {
+            nodes {
+              id
+              name
+              slug
+            }
+          }
           customLogo {
             node {
               sourceUrl
@@ -187,14 +199,20 @@ export const GET_DESIGN_PROJECTS = `
           category
           client
           year
-          projectUrl
+          projecturl
           gallery {
             nodes {
               sourceUrl
               altText
             }
           }
-          contributionTypeTags
+          contributionTypeTags {
+            nodes {
+              id
+              name
+              slug
+            }
+          }
         }
         portfolioTags {
           nodes {

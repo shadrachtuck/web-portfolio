@@ -16,7 +16,8 @@ function ProjectCard({ project, index, isDesignProject = false }) {
   const firstImage = gallery[0] || featuredImage;
   const techStack = details.techStack || [];
   const description = project.content || project.excerpt || "";
-  const contributionTypeTags = details.contributionTypeTags || [];
+  const contributionTypeTagNodes = details.contributionTypeTags?.nodes || [];
+  const contributionTypeTags = contributionTypeTagNodes.map((n) => (typeof n === 'string' ? n : n.slug));
   const portfolioTags = project.portfolioTags?.nodes || [];
   const category = details.category;
   
@@ -182,9 +183,9 @@ function ProjectCard({ project, index, isDesignProject = false }) {
           />
         )}
         <div className="flex gap-3 pt-2">
-          {details.projectUrl && (
+          {(details.projectUrl || details.projecturl) && (
             <a
-              href={details.projectUrl}
+              href={details.projectUrl || details.projecturl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
@@ -193,9 +194,9 @@ function ProjectCard({ project, index, isDesignProject = false }) {
               View Project <span>›</span>
             </a>
           )}
-          {details.githubUrl && (
+          {(details.githubUrl || details.githuburl) && (
             <a
-              href={details.githubUrl}
+              href={details.githubUrl || details.githuburl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
