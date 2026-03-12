@@ -2,24 +2,27 @@ import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef, useState, useMemo } from "react";
 import { useWebProjects, useDesignProjects, usePortfolioTags } from "../hooks/useWordPressData";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 
 function ProjectCard({ project, index, isDesignProject = false }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [isExpanded, setIsExpanded] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
 
   const details = project.webProjectDetails || project.designProjectDetails || {};
   const featuredImage = project.featuredImage?.node;
   const galleryConnection = details.screenshots || details.gallery;
   const gallery = galleryConnection?.nodes || galleryConnection || [];
-  const firstImage = gallery[0] || featuredImage;
+  // Featured image always shows at top; no fallback to gallery
+  const mainImage = featuredImage;
   // Normalize techStack: GraphQL returns [{ tech: "React" }, ...]; ensure we always have strings for rendering
   const techStack = (details.techStack || []).map((item) =>
     typeof item === 'string' ? item : (item?.tech ?? item?.value ?? '')
   ).filter(Boolean);
   const description = project.content || project.excerpt || "";
-  const contributionTypeTagNodes = details.contributionTypeTags?.nodes || [];
+  const rawTags = details.contributionTypeTags;
+  const contributionTypeTagNodes = Array.isArray(rawTags) ? rawTags : (rawTags?.nodes || []);
   const contributionTypeTags = contributionTypeTagNodes.map((n) => (typeof n === 'string' ? n : n.slug));
   const portfolioTags = project.portfolioTags?.nodes || [];
   const category = details.category;
@@ -55,15 +58,15 @@ function ProjectCard({ project, index, isDesignProject = false }) {
       className="group cursor-pointer project-card-border bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md"
     >
       <div className="relative overflow-hidden mb-4 aspect-[4/3] bg-zinc-100 dark:bg-zinc-800">
-        {firstImage ? (
+        {mainImage ? (
           <motion.div
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.4 }}
             className="w-full h-full"
           >
             <img
-              src={firstImage.sourceUrl || firstImage.url}
-              alt={firstImage.altText || project.title}
+              src={mainImage.sourceUrl || mainImage.url}
+              alt={mainImage.altText || project.title}
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -122,8 +125,8 @@ function ProjectCard({ project, index, isDesignProject = false }) {
           )}
         </div>
         
-        {/* Collapsible Metadata */}
-        {(description || techStack.length > 0) && (
+        {/* Collapsible Metadata & Gallery */}
+        {(description || techStack.length > 0 || gallery.length > 0) && (
           <div className="mb-2">
             <button
               onClick={(e) => {
@@ -158,6 +161,63 @@ function ProjectCard({ project, index, isDesignProject = false }) {
                     className="text-zinc-600 dark:text-zinc-400 text-sm"
                     dangerouslySetInnerHTML={{ __html: description }}
                   />
+                )}
+                {gallery.length > 0 && (
+                  <div className="relative">
+                    <div className="aspect-video w-full overflow-hidden rounded bg-zinc-100 dark:bg-zinc-800">
+                      <motion.img
+                        key={galleryIndex}
+                        src={gallery[galleryIndex]?.sourceUrl || gallery[galleryIndex]?.url}
+                        alt={gallery[galleryIndex]?.altText || `${project.title} screenshot ${galleryIndex + 1}`}
+                        className="w-full h-full object-contain"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </div>
+                    {gallery.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setGalleryIndex((i) => (i === 0 ? gallery.length - 1 : i - 1));
+                          }}
+                          className="absolute left-1 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors"
+                          aria-label="Previous image"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setGalleryIndex((i) => (i === gallery.length - 1 ? 0 : i + 1));
+                          }}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors"
+                          aria-label="Next image"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                        <div className="flex justify-center gap-1.5 mt-2">
+                          {gallery.map((_, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setGalleryIndex(idx);
+                              }}
+                              className={`w-2 h-2 rounded-full transition-colors ${
+                                idx === galleryIndex ? "bg-green-500" : "bg-zinc-300 dark:bg-zinc-600"
+                              }`}
+                              aria-label={`Go to image ${idx + 1}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 )}
                 {techStack.length > 0 && (
                   <div>

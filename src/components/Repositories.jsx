@@ -71,7 +71,8 @@ function RepositoryCard({ repository, index }) {
   // ACF image fields return as ConnectionEdge, so we access node directly
   const customLogo = details.customLogo?.node || details.customLogo || details.customlogo?.node || details.customlogo;
   const isFork = details.isFork === true || details.isFork === 1 || details.isfork === true || details.isfork === 1;
-  const contributionTypeTagNodes = details.contributionTypeTags?.nodes || [];
+  const rawTags = details.contributionTypeTags;
+  const contributionTypeTagNodes = Array.isArray(rawTags) ? rawTags : (rawTags?.nodes || []);
   const contributionTypeTags = contributionTypeTagNodes.map((n) => (typeof n === "string" ? n : n.slug));
   const portfolioTags = repository.portfolioTags?.nodes || [];
   
