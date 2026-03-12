@@ -3,6 +3,7 @@ import { useInView } from "motion/react";
 import { useRef, useState, useMemo } from "react";
 import { useRepositories, usePortfolioTags } from "../hooks/useWordPressData";
 import { ExternalLink, Star, Link as LinkIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { normalizeContributionTypeTags, getRepositoryUrl, getSiteUrl } from "../lib/mishap-types.js";
 
 // Platform Logo Components
 function GitHubIcon({ className = "w-6 h-6" }) {
@@ -71,9 +72,7 @@ function RepositoryCard({ repository, index }) {
   // ACF image fields return as ConnectionEdge, so we access node directly
   const customLogo = details.customLogo?.node || details.customLogo || details.customlogo?.node || details.customlogo;
   const isFork = details.isFork === true || details.isFork === 1 || details.isfork === true || details.isfork === 1;
-  const rawTags = details.contributionTypeTags;
-  const contributionTypeTagNodes = Array.isArray(rawTags) ? rawTags : (rawTags?.nodes || []);
-  const contributionTypeTags = contributionTypeTagNodes.map((n) => (typeof n === "string" ? n : n.slug));
+  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags);
   const portfolioTags = repository.portfolioTags?.nodes || [];
   
   const getContributionTypeTagLabel = (tag) => {
@@ -249,11 +248,11 @@ function RepositoryCard({ repository, index }) {
           />
         )}
 
-        {(details.repositoryUrl || details.repositoryurl || details.siteUrl || details.siteurl) && (
+        {(getRepositoryUrl(details) || getSiteUrl(details)) && (
           <div className="flex flex-wrap gap-3 pt-2">
-            {(details.repositoryUrl || details.repositoryurl) && (
+            {getRepositoryUrl(details) && (
               <a
-                href={details.repositoryUrl || details.repositoryurl}
+                href={getRepositoryUrl(details)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
@@ -263,9 +262,9 @@ function RepositoryCard({ repository, index }) {
                 View Repository
               </a>
             )}
-            {(details.siteUrl || details.siteurl) && (
+            {getSiteUrl(details) && (
               <a
-                href={details.siteUrl || details.siteurl}
+                href={getSiteUrl(details)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"

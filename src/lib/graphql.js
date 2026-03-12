@@ -1,6 +1,9 @@
 /**
  * GraphQL client for WordPress WPGraphQL
  * Web Development Portfolio - Web Projects Only
+ *
+ * Field names match mishap-creative-works plugin ACF (wp-content/plugins/mishap-creative-works/acf-json/).
+ * See src/lib/mishap-types.js for type definitions and accessor helpers.
  */
 
 import { WP_GRAPHQL_URL } from './config.js';

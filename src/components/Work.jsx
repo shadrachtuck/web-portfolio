@@ -3,6 +3,7 @@ import { useInView } from "motion/react";
 import { useRef, useState, useMemo } from "react";
 import { useWebProjects, useDesignProjects, usePortfolioTags } from "../hooks/useWordPressData";
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { normalizeContributionTypeTags, getProjectUrl, getGithubUrl } from "../lib/mishap-types.js";
 
 function ProjectCard({ project, index, isDesignProject = false }) {
   const ref = useRef(null);
@@ -21,9 +22,7 @@ function ProjectCard({ project, index, isDesignProject = false }) {
     typeof item === 'string' ? item : (item?.tech ?? item?.value ?? '')
   ).filter(Boolean);
   const description = project.content || project.excerpt || "";
-  const rawTags = details.contributionTypeTags;
-  const contributionTypeTagNodes = Array.isArray(rawTags) ? rawTags : (rawTags?.nodes || []);
-  const contributionTypeTags = contributionTypeTagNodes.map((n) => (typeof n === 'string' ? n : n.slug));
+  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags);
   const portfolioTags = project.portfolioTags?.nodes || [];
   const category = details.category;
   
@@ -246,9 +245,9 @@ function ProjectCard({ project, index, isDesignProject = false }) {
           />
         )}
         <div className="flex gap-3 pt-2">
-          {(details.projectUrl || details.projecturl) && (
+          {getProjectUrl(details) && (
             <a
-              href={details.projectUrl || details.projecturl}
+              href={getProjectUrl(details)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
@@ -257,9 +256,9 @@ function ProjectCard({ project, index, isDesignProject = false }) {
               View Project <span>›</span>
             </a>
           )}
-          {(details.githubUrl || details.githuburl) && (
+          {getGithubUrl(details) && (
             <a
-              href={details.githubUrl || details.githuburl}
+              href={getGithubUrl(details)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
