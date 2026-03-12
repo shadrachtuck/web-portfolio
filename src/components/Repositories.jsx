@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef, useState, useMemo } from "react";
 import { useRepositories, usePortfolioTags } from "../hooks/useWordPressData";
-import { ExternalLink, GitBranch, Star, Link as LinkIcon, Lock, Unlock, Folder, ChevronDown, ChevronUp } from "lucide-react";
+import { ExternalLink, Star, Link as LinkIcon, ChevronDown, ChevronUp } from "lucide-react";
 
 // Platform Logo Components
 function GitHubIcon({ className = "w-6 h-6" }) {
@@ -68,9 +68,6 @@ function RepositoryCard({ repository, index }) {
   const linkType = details.linkType || details.linktype || "repository";
   const isRepository = linkType === "repository";
   const platform = details.platform || "github";
-  // Handle both camelCase and lowercase ACF field names from GraphQL
-  const contributionMetaRaw = details.contributionMeta || details.contributionmeta || details.contribution_meta;
-  const contributionMeta = contributionMetaRaw ? String(contributionMetaRaw).toLowerCase().trim() : "public_repo";
   // ACF image fields return as ConnectionEdge, so we access node directly
   const customLogo = details.customLogo?.node || details.customLogo || details.customlogo?.node || details.customlogo;
   const isFork = details.isFork === true || details.isFork === 1 || details.isfork === true || details.isfork === 1;
@@ -99,75 +96,13 @@ function RepositoryCard({ repository, index }) {
         return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300";
     }
   };
-  
-  // // Debug logging to help identify the issue
-  // if (process.env.NODE_ENV === 'development' && contributionMetaRaw) {
-  //   console.log(`[${repository.title}] Contribution Meta - Raw:`, contributionMetaRaw, 'Processed:', contributionMeta, 'All details:', details);
-  // }
-  
-  const getContributionMetaLabel = () => {
-    // Normalize the value to handle any case or whitespace issues
-    const normalized = String(contributionMeta).toLowerCase().trim();
-    switch (normalized) {
-      case "private_repo":
-      case "privaterepo":
-      case "private":
-        return "Private Repo";
-      case "public_repo":
-      case "publicrepo":
-      case "public":
-        return "Public Repo";
-      case "site":
-        return "Site";
-      case "project":
-        return "Project";
-      default:
-        // Log unexpected values for debugging
-        console.warn('Unexpected contributionMeta value:', contributionMeta, 'for repository:', repository.title);
-        return "Public Repo";
-    }
-  };
 
-  const getContributionMetaIcon = () => {
-    // Normalize the value to handle any case or whitespace issues
-    const normalized = String(contributionMeta).toLowerCase().trim();
-    switch (normalized) {
-      case "private_repo":
-      case "privaterepo":
-      case "private":
-        return <Lock className="w-3.5 h-3.5" />;
-      case "public_repo":
-      case "publicrepo":
-      case "public":
-        return <GitBranch className="w-3.5 h-3.5" />;
-      case "site":
-        return <LinkIcon className="w-3.5 h-3.5" />;
-      case "project":
-        return <Folder className="w-3.5 h-3.5" />;
-      default:
-        return <GitBranch className="w-3.5 h-3.5" />;
-    }
-  };
-
-  const getContributionMetaColor = () => {
-    // Normalize the value to handle any case or whitespace issues
-    const normalized = String(contributionMeta).toLowerCase().trim();
-    switch (normalized) {
-      case "private_repo":
-      case "privaterepo":
-      case "private":
-        return "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300";
-      case "public_repo":
-      case "publicrepo":
-      case "public":
-        return "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300";
-      case "site":
-        return "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300";
-      case "project":
-        return "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300";
-      default:
-        return "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300";
-    }
+  const platformColors = {
+    github: "bg-zinc-800 dark:bg-zinc-700",
+    gitlab: "bg-orange-600 dark:bg-orange-700",
+    bitbucket: "bg-blue-600 dark:bg-blue-700",
+    azure: "bg-blue-500 dark:bg-blue-600",
+    other: "bg-zinc-600 dark:bg-zinc-700",
   };
 
   return (
@@ -213,10 +148,13 @@ function RepositoryCard({ repository, index }) {
                     {(details.contributionType || details.contributiontype).replace("_", " ")}
                   </span>
                 )}
-              <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded font-medium ${getContributionMetaColor()}`}>
-                {getContributionMetaIcon()}
-                <span>{getContributionMetaLabel()}</span>
-              </span>
+              {/* Platform tag for repositories */}
+              {isRepository && (
+                <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded font-medium text-white ${platformColors[platform] || platformColors.other}`}>
+                  <PlatformIcon platform={platform} isRepository={true} className="w-3.5 h-3.5" />
+                  <span>{platform === "azure" ? "Azure" : platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
+                </span>
+              )}
               {/* Contribution Type Tags */}
               {contributionTypeTags && Array.isArray(contributionTypeTags) && contributionTypeTags.length > 0 && (
                 <>

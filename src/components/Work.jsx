@@ -14,7 +14,10 @@ function ProjectCard({ project, index, isDesignProject = false }) {
   const galleryConnection = details.screenshots || details.gallery;
   const gallery = galleryConnection?.nodes || galleryConnection || [];
   const firstImage = gallery[0] || featuredImage;
-  const techStack = details.techStack || [];
+  // Normalize techStack: GraphQL returns [{ tech: "React" }, ...]; ensure we always have strings for rendering
+  const techStack = (details.techStack || []).map((item) =>
+    typeof item === 'string' ? item : (item?.tech ?? item?.value ?? '')
+  ).filter(Boolean);
   const description = project.content || project.excerpt || "";
   const contributionTypeTagNodes = details.contributionTypeTags?.nodes || [];
   const contributionTypeTags = contributionTypeTagNodes.map((n) => (typeof n === 'string' ? n : n.slug));
