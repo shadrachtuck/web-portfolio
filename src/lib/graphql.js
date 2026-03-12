@@ -256,8 +256,8 @@ export const GET_ABOUT_PAGE = `
         experience {
           title
           company
-          startyear
-          endyear
+          startYear
+          endYear
         }
       }
     }
