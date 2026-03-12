@@ -17,7 +17,8 @@ import { WP_GRAPHQL_URL } from './config.js';
  */
 export async function graphqlRequest(query, variables = {}) {
   // #region agent log
-  fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'graphql.js:19',message:'GraphQL request entry',data:{url:WP_GRAPHQL_URL,query:query.substring(0,200),hasVariables:Object.keys(variables).length>0},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  const rootFieldMatch = query.match(/\{\s*(\w+)\s*\(/);
+  fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'8ebb9d',location:'graphql.js:19',message:'GraphQL request entry',data:{url:WP_GRAPHQL_URL,rootField:rootFieldMatch?rootFieldMatch[1]:null,hasWebprojects:query.includes('webprojects'),hasWebProjects:query.includes('webProjects'),queryPrefix:query.substring(0,150)},timestamp:Date.now(),runId:'run1',hypothesisId:'A'})}).catch(()=>{});
   // #endregion
   try {
     const response = await fetch(WP_GRAPHQL_URL, {
@@ -87,21 +88,15 @@ export const GET_WEB_PROJECTS = `
           }
           client
           year
-          projecturl
-          githuburl
+          projectUrl
+          githubUrl
           screenshots {
             nodes {
               sourceUrl
               altText
             }
           }
-          contributionTypeTags {
-            nodes {
-              id
-              name
-              slug
-            }
-          }
+          contributionTypeTags
         }
         portfolioTags {
           nodes {
@@ -139,24 +134,18 @@ export const GET_REPOSITORIES = `
           }
         }
         repositoryDetails {
-          linktype
-          contributionmeta
-          repositoryurl
-          siteurl
+          linkType
+          contributionMeta
+          repositoryUrl
+          siteUrl
           platform
           language
           stars
-          contributiontype
+          contributionType
           isFork
           year
-          contributionTypeTags {
-            nodes {
-              id
-              name
-              slug
-            }
-          }
-          customlogo {
+          contributionTypeTags
+          customLogo {
             node {
               sourceUrl
               altText
@@ -202,20 +191,14 @@ export const GET_DESIGN_PROJECTS = `
           category
           client
           year
-          projecturl
+          projectUrl
           gallery {
             nodes {
               sourceUrl
               altText
             }
           }
-          contributionTypeTags {
-            nodes {
-              id
-              name
-              slug
-            }
-          }
+          contributionTypeTags
         }
         portfolioTags {
           nodes {
@@ -299,20 +282,3 @@ export const GET_ABOUT_PAGE = `
   }
 `;
 
-/**
- * Introspect WebProject type to see available fields
- */
-export const INTROSPECT_WEB_PROJECT = `
-  query IntrospectWebProject {
-    __type(name: "WebProject") {
-      name
-      fields {
-        name
-        type {
-          name
-          kind
-        }
-      }
-    }
-  }
-`;

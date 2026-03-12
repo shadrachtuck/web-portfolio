@@ -1,9 +1,9 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef, useState, useMemo } from "react";
-import { useRepositories, usePortfolioTags } from "../hooks/useWordPressData";
+import { useRepositories } from "../hooks/useWordPressData";
 import { ExternalLink, Star, Link as LinkIcon, ChevronDown, ChevronUp } from "lucide-react";
-import { normalizeContributionTypeTags, getRepositoryUrl, getSiteUrl } from "../lib/mishap-types.js";
+import { normalizeContributionTypeTags, getRepositoryUrl, getSiteUrl, getContributionTypeTagLabel, getContributionTypeTagColor } from "../lib/mishap-types.js";
 
 // Platform Logo Components
 function GitHubIcon({ className = "w-6 h-6" }) {
@@ -63,8 +63,8 @@ function RepositoryCard({ repository, index }) {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const details = repository.repositoryDetails || {};
-  const featuredImage = repository.featuredImage?.node;
+  const details = repository.repositoryDetails || repository.repositorydetails || {};
+  const featuredImage = repository.featuredImage?.node || repository.featuredimage?.node;
   const description = repository.content || repository.excerpt || "";
   const linkType = details.linkType || details.linktype || "repository";
   const isRepository = linkType === "repository";
@@ -72,30 +72,8 @@ function RepositoryCard({ repository, index }) {
   // ACF image fields return as ConnectionEdge, so we access node directly
   const customLogo = details.customLogo?.node || details.customLogo || details.customlogo?.node || details.customlogo;
   const isFork = details.isFork === true || details.isFork === 1 || details.isfork === true || details.isfork === 1;
-  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags);
-  const portfolioTags = repository.portfolioTags?.nodes || [];
-  
-  const getContributionTypeTagLabel = (tag) => {
-    switch (tag) {
-      case "software_web":
-        return "Software/Web";
-      case "ux_ui_design":
-        return "UX/UI Design";
-      default:
-        return tag;
-    }
-  };
-
-  const getContributionTypeTagColor = (tag) => {
-    switch (tag) {
-      case "software_web":
-        return "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300";
-      case "ux_ui_design":
-        return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
-      default:
-        return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300";
-    }
-  };
+  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags ?? details.contributiontypetags);
+  const portfolioTags = repository.portfolioTags?.nodes || repository.portfoliotags?.nodes || [];
 
   const platformColors = {
     github: "bg-zinc-800 dark:bg-zinc-700",
@@ -121,8 +99,8 @@ function RepositoryCard({ repository, index }) {
                 {customLogo ? (
                   <div className="flex-shrink-0">
                     <img 
-                      src={customLogo.sourceUrl} 
-                      alt={customLogo.altText || repository.title}
+                      src={customLogo.sourceUrl || customLogo.sourceurl} 
+                      alt={customLogo.altText || customLogo.alttext || repository.title}
                       className="w-7 h-7 object-contain"
                     />
                   </div>
@@ -281,30 +259,20 @@ function RepositoryCard({ repository, index }) {
   );
 }
 
-export function Repositories() {
+export function Repositories({ portfolioTags = [], selectedTags = [], onToggleTag }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { repositories, loading, error } = useRepositories();
-  const { tags: portfolioTags, loading: tagsLoading } = usePortfolioTags();
-  const [selectedTags, setSelectedTags] = useState([]);
 
   // Filter repositories by selected tags
   const filteredRepositories = useMemo(() => {
     if (selectedTags.length === 0) return repositories;
     return repositories.filter(repository => {
-      const repoTags = repository.portfolioTags?.nodes || [];
+      const repoTags = repository.portfolioTags?.nodes || repository.portfoliotags?.nodes || [];
       const repoTagSlugs = repoTags.map(tag => tag.slug);
       return selectedTags.some(selectedSlug => repoTagSlugs.includes(selectedSlug));
     });
   }, [repositories, selectedTags]);
-
-  const toggleTag = (tagSlug) => {
-    setSelectedTags(prev => 
-      prev.includes(tagSlug) 
-        ? prev.filter(slug => slug !== tagSlug)
-        : [...prev, tagSlug]
-    );
-  };
 
   return (
     <section id="repositories" ref={ref} className="min-h-screen px-6 md:px-16 lg:px-24 py-10">
@@ -321,42 +289,6 @@ export function Repositories() {
           Repositories and other site links I've contributed to for open source and other projects
         </p>
       </motion.div>
-
-      {/* Tag Filter */}
-      {!tagsLoading && portfolioTags.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="mb-8"
-        >
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mr-2">Filter by tag:</span>
-            {portfolioTags.map((tag) => (
-              <button
-                key={tag.id}
-                onClick={() => toggleTag(tag.slug)}
-                className={`px-4 py-2 text-sm font-medium rounded transition-all ${
-                  selectedTags.includes(tag.slug)
-                    ? 'bg-green-500 text-white dark:bg-green-600'
-                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                }`}
-              >
-                {tag.name}
-                {tag.count && <span className="ml-1 opacity-75">({tag.count})</span>}
-              </button>
-            ))}
-            {selectedTags.length > 0 && (
-              <button
-                onClick={() => setSelectedTags([])}
-                className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
-        </motion.div>
-      )}
 
       {loading && (
         <div className="flex items-center justify-center py-20">

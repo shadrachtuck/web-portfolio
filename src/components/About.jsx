@@ -13,17 +13,17 @@ export function About() {
   const [skillsPage, setSkillsPage] = useState(0);
 
   const bioHtml = useMemo(() => {
-    const acfBio = aboutPage?.aboutPageDetails?.bio;
+    const acfBio = aboutPage?.aboutPageDetails?.bio ?? aboutPage?.aboutpagedetails?.bio;
     if (acfBio && String(acfBio).trim() !== "") return acfBio;
     const pageContent = aboutPage?.content;
     if (pageContent && String(pageContent).trim() !== "") return pageContent;
     return "";
   }, [aboutPage]);
 
-  const featuredImageUrl = aboutPage?.featuredImage?.node?.sourceUrl;
+  const featuredImageUrl = aboutPage?.featuredImage?.node?.sourceUrl ?? aboutPage?.featuredimage?.node?.sourceurl;
 
   const experienceItems = useMemo(() => {
-    const fromWp = aboutPage?.aboutPageDetails?.experience;
+    const fromWp = aboutPage?.aboutPageDetails?.experience ?? aboutPage?.aboutpagedetails?.experience;
     if (Array.isArray(fromWp) && fromWp.length > 0) return fromWp;
     return [
       { title: "Freelance Full-Stack Developer", company: "Mishap Creative Works", startYear: "2019", endYear: "Present" },
@@ -66,7 +66,7 @@ export function About() {
           {featuredImageUrl ? (
             <img
               src={featuredImageUrl}
-              alt={aboutPage?.featuredImage?.node?.altText || "About me"}
+              alt={aboutPage?.featuredImage?.node?.altText ?? aboutPage?.featuredimage?.node?.alttext ?? "About me"}
               className="absolute inset-0 w-full h-full object-cover grayscale"
             />
           ) : (
@@ -196,8 +196,8 @@ export function About() {
                 {experienceItems.map((item, idx) => {
                   const title = item?.title || "";
                   const company = item?.company || "";
-                  const start = item?.startYear || item?.start_year || "";
-                  const end = item?.endYear || item?.end_year || "";
+                  const start = item?.startYear || item?.start_year || item?.startyear || "";
+                  const end = item?.endYear || item?.end_year || item?.endyear || "";
                   const years = [start, end].filter(Boolean).join(" - ");
 
                   return (

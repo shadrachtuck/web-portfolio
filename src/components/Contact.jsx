@@ -14,9 +14,10 @@ export function Contact() {
     async function fetchSiteSettings() {
       try {
         const data = await graphqlRequest(GET_SITE_SETTINGS);
-        // Get site settings from RootQuery
-        if (data?.siteSettings) {
-          setSiteSettings(data.siteSettings);
+        // Get site settings from RootQuery (handle both camelCase and lowercase)
+        const settings = data?.siteSettings || data?.sitesettings;
+        if (settings) {
+          setSiteSettings(settings);
         }
       } catch (error) {
         console.error("Error fetching site settings:", error);
@@ -27,10 +28,10 @@ export function Contact() {
     fetchSiteSettings();
   }, []);
 
-  // Build socials array from backend data, with fallbacks
-  const email = siteSettings?.emailAddress || "shadrachtuck@gmail.com";
-  const githubUrl = siteSettings?.githubUrl || "#";
-  const linkedinUrl = siteSettings?.linkedinUrl || "#";
+  // Build socials array from backend data, with fallbacks (handle lowercase)
+  const email = siteSettings?.emailAddress || siteSettings?.emailaddress || "shadrachtuck@gmail.com";
+  const githubUrl = siteSettings?.githubUrl || siteSettings?.githuburl || "#";
+  const linkedinUrl = siteSettings?.linkedinUrl || siteSettings?.linkedinurl || "#";
 
   const socials = [
     { name: "Email", icon: Mail, href: `mailto:${email}` },

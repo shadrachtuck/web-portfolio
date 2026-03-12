@@ -105,3 +105,35 @@ export function getRepositoryUrl(details) {
 export function getSiteUrl(details) {
   return details?.siteurl || details?.siteUrl;
 }
+
+/**
+ * Get display label for contribution type tag slug
+ * @param {string} tag
+ * @returns {string}
+ */
+export function getContributionTypeTagLabel(tag) {
+  switch (tag) {
+    case "software_web":
+      return "Software/Web";
+    case "ux_ui_design":
+      return "UX/UI Design";
+    default:
+      return tag;
+  }
+}
+
+/**
+ * Get Tailwind classes for contribution type tag badge
+ * @param {string} tag
+ * @returns {string}
+ */
+export function getContributionTypeTagColor(tag) {
+  switch (tag) {
+    case "software_web":
+      return "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300";
+    case "ux_ui_design":
+      return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
+    default:
+      return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300";
+  }
+}

@@ -1,9 +1,9 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef, useState, useMemo } from "react";
-import { useWebProjects, useDesignProjects, usePortfolioTags } from "../hooks/useWordPressData";
+import { useWebProjects, useDesignProjects } from "../hooks/useWordPressData";
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
-import { normalizeContributionTypeTags, getProjectUrl, getGithubUrl } from "../lib/mishap-types.js";
+import { normalizeContributionTypeTags, getProjectUrl, getGithubUrl, getContributionTypeTagLabel, getContributionTypeTagColor } from "../lib/mishap-types.js";
 
 function ProjectCard({ project, index, isDesignProject = false }) {
   const ref = useRef(null);
@@ -11,42 +11,20 @@ function ProjectCard({ project, index, isDesignProject = false }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
 
-  const details = project.webProjectDetails || project.designProjectDetails || {};
-  const featuredImage = project.featuredImage?.node;
+  const details = project.webProjectDetails || project.webprojectdetails || project.designProjectDetails || project.designprojectdetails || {};
+  const featuredImage = project.featuredImage?.node || project.featuredimage?.node;
   const galleryConnection = details.screenshots || details.gallery;
   const gallery = galleryConnection?.nodes || galleryConnection || [];
   // Featured image always shows at top; no fallback to gallery
   const mainImage = featuredImage;
   // Normalize techStack: GraphQL returns [{ tech: "React" }, ...]; ensure we always have strings for rendering
-  const techStack = (details.techStack || []).map((item) =>
+  const techStack = (details.techStack || details.techstack || []).map((item) =>
     typeof item === 'string' ? item : (item?.tech ?? item?.value ?? '')
   ).filter(Boolean);
   const description = project.content || project.excerpt || "";
-  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags);
-  const portfolioTags = project.portfolioTags?.nodes || [];
+  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags ?? details.contributiontypetags);
+  const portfolioTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
   const category = details.category;
-  
-  const getContributionTypeTagLabel = (tag) => {
-    switch (tag) {
-      case "software_web":
-        return "Software/Web";
-      case "ux_ui_design":
-        return "UX/UI Design";
-      default:
-        return tag;
-    }
-  };
-
-  const getContributionTypeTagColor = (tag) => {
-    switch (tag) {
-      case "software_web":
-        return "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300";
-      case "ux_ui_design":
-        return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
-      default:
-        return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300";
-    }
-  };
 
   return (
     <motion.div
@@ -64,8 +42,8 @@ function ProjectCard({ project, index, isDesignProject = false }) {
             className="w-full h-full"
           >
             <img
-              src={mainImage.sourceUrl || mainImage.url}
-              alt={mainImage.altText || project.title}
+              src={mainImage.sourceUrl || mainImage.sourceurl || mainImage.url}
+              alt={mainImage.altText || mainImage.alttext || project.title}
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -166,8 +144,8 @@ function ProjectCard({ project, index, isDesignProject = false }) {
                     <div className="aspect-video w-full overflow-hidden rounded bg-zinc-100 dark:bg-zinc-800">
                       <motion.img
                         key={galleryIndex}
-                        src={gallery[galleryIndex]?.sourceUrl || gallery[galleryIndex]?.url}
-                        alt={gallery[galleryIndex]?.altText || `${project.title} screenshot ${galleryIndex + 1}`}
+                        src={gallery[galleryIndex]?.sourceUrl || gallery[galleryIndex]?.sourceurl || gallery[galleryIndex]?.url}
+                        alt={gallery[galleryIndex]?.altText || gallery[galleryIndex]?.alttext || `${project.title} screenshot ${galleryIndex + 1}`}
                         className="w-full h-full object-contain"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -273,13 +251,11 @@ function ProjectCard({ project, index, isDesignProject = false }) {
   );
 }
 
-export function Work() {
+export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { projects: webProjects, loading: webLoading, error: webError } = useWebProjects();
   const { projects: designProjects, loading: designLoading, error: designError } = useDesignProjects();
-  const { tags: portfolioTags, loading: tagsLoading } = usePortfolioTags();
-  const [selectedTags, setSelectedTags] = useState([]);
   
   const loading = webLoading || designLoading;
   const error = webError || designError;
@@ -288,7 +264,7 @@ export function Work() {
   const filteredWebProjects = useMemo(() => {
     if (selectedTags.length === 0) return webProjects;
     return webProjects.filter(project => {
-      const projectTags = project.portfolioTags?.nodes || [];
+      const projectTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
       const projectTagSlugs = projectTags.map(tag => tag.slug);
       return selectedTags.some(selectedSlug => projectTagSlugs.includes(selectedSlug));
     });
@@ -297,19 +273,11 @@ export function Work() {
   const filteredDesignProjects = useMemo(() => {
     if (selectedTags.length === 0) return designProjects;
     return designProjects.filter(project => {
-      const projectTags = project.portfolioTags?.nodes || [];
+      const projectTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
       const projectTagSlugs = projectTags.map(tag => tag.slug);
       return selectedTags.some(selectedSlug => projectTagSlugs.includes(selectedSlug));
     });
   }, [designProjects, selectedTags]);
-
-  const toggleTag = (tagSlug) => {
-    setSelectedTags(prev => 
-      prev.includes(tagSlug) 
-        ? prev.filter(slug => slug !== tagSlug)
-        : [...prev, tagSlug]
-    );
-  };
 
   return (
     <section id="work" ref={ref} className="min-h-screen px-6 md:px-16 lg:px-24 py-10">
@@ -326,42 +294,6 @@ export function Work() {
           A curated collection of web development and software projects
         </p>
       </motion.div>
-
-      {/* Tag Filter */}
-      {!tagsLoading && portfolioTags.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="mb-8"
-        >
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mr-2">Filter by tag:</span>
-            {portfolioTags.map((tag) => (
-              <button
-                key={tag.id}
-                onClick={() => toggleTag(tag.slug)}
-                className={`px-4 py-2 text-sm font-medium rounded transition-all ${
-                  selectedTags.includes(tag.slug)
-                    ? 'bg-green-500 text-white dark:bg-green-600'
-                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                }`}
-              >
-                {tag.name}
-                {tag.count && <span className="ml-1 opacity-75">({tag.count})</span>}
-              </button>
-            ))}
-            {selectedTags.length > 0 && (
-              <button
-                onClick={() => setSelectedTags([])}
-                className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
-        </motion.div>
-      )}
 
       {loading && (
         <div className="flex items-center justify-center py-20">
