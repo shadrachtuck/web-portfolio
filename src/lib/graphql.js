@@ -124,7 +124,7 @@ export const GET_REPOSITORIES = `
           language
           stars
           contributiontype
-          isfork
+          isFork
           year
           contributiontypetags
           customlogo {
