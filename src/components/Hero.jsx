@@ -270,7 +270,7 @@ export function Hero() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 20 }}
-          className="hidden md:flex fixed right-8 top-1/2 -translate-y-1/2 z-[150] flex-col gap-4 items-end"
+          className="hidden md:flex fixed right-8 top-1/2 -translate-y-1/2 z-[150] flex-col gap-4 items-center"
         >
           <motion.button
             onClick={scrollToPrevious}
@@ -287,7 +287,7 @@ export function Hero() {
               <span className="arrow-btn-icon-up text-4xl md:text-5xl font-ds-terminal header-style leading-none">v</span>
             </motion.div>
           </motion.button>
-          <span className="text-xs font-ds-terminal text-[#12490d] dark:text-green-400">Jump to section</span>
+          <span className="text-xs font-ds-terminal text-[#12490d] dark:text-green-400 text-center w-full">Jump to section</span>
           {isAtBottom ? (
             <motion.button
               onClick={() => {

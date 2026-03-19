@@ -181,20 +181,30 @@ body {
 
 .arrow-btn-icon-up {
   font-size: 4rem;
-  margin-top: 1rem;
-  transform: rotate(180deg)
+  transform: rotate(180deg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .arrow-btn-icon-down {
   font-size: 4rem;
-  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .arrow-btn-icon-left {
   font-size: 2.5rem;
   transform: rotate(90deg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .arrow-btn-icon-right {
   font-size: 2.5rem;
   transform: rotate(-90deg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Ensure other sections appear below hero and don't overlap */
