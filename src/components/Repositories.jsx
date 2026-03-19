@@ -264,13 +264,14 @@ export function Repositories({ portfolioTags = [], selectedTags = [], onToggleTa
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { repositories, loading, error } = useRepositories();
 
-  // Filter repositories by selected tags
+  // Filter repositories by selected tags (case-insensitive slug match)
   const filteredRepositories = useMemo(() => {
     if (selectedTags.length === 0) return repositories;
+    const selectedSlugs = selectedTags.map(s => (s || "").toLowerCase());
     return repositories.filter(repository => {
       const repoTags = repository.portfolioTags?.nodes || repository.portfoliotags?.nodes || [];
-      const repoTagSlugs = repoTags.map(tag => tag.slug);
-      return selectedTags.some(selectedSlug => repoTagSlugs.includes(selectedSlug));
+      const repoTagSlugs = repoTags.map(tag => (tag?.slug || tag?.name || "").toLowerCase()).filter(Boolean);
+      return selectedSlugs.some(slug => repoTagSlugs.includes(slug));
     });
   }, [repositories, selectedTags]);
 

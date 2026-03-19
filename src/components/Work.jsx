@@ -260,22 +260,24 @@ export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
   const loading = webLoading || designLoading;
   const error = webError || designError;
 
-  // Filter projects by selected tags
+  // Filter projects by selected tags (case-insensitive slug match)
   const filteredWebProjects = useMemo(() => {
     if (selectedTags.length === 0) return webProjects;
+    const selectedSlugs = selectedTags.map(s => (s || "").toLowerCase());
     return webProjects.filter(project => {
       const projectTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
-      const projectTagSlugs = projectTags.map(tag => tag.slug);
-      return selectedTags.some(selectedSlug => projectTagSlugs.includes(selectedSlug));
+      const projectTagSlugs = projectTags.map(tag => (tag?.slug || tag?.name || "").toLowerCase()).filter(Boolean);
+      return selectedSlugs.some(slug => projectTagSlugs.includes(slug));
     });
   }, [webProjects, selectedTags]);
 
   const filteredDesignProjects = useMemo(() => {
     if (selectedTags.length === 0) return designProjects;
+    const selectedSlugs = selectedTags.map(s => (s || "").toLowerCase());
     return designProjects.filter(project => {
       const projectTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
-      const projectTagSlugs = projectTags.map(tag => tag.slug);
-      return selectedTags.some(selectedSlug => projectTagSlugs.includes(selectedSlug));
+      const projectTagSlugs = projectTags.map(tag => (tag?.slug || tag?.name || "").toLowerCase()).filter(Boolean);
+      return selectedSlugs.some(slug => projectTagSlugs.includes(slug));
     });
   }, [designProjects, selectedTags]);
 
