@@ -65,7 +65,7 @@ function ProjectCard({ project, index, isDesignProject = false }) {
           {techStack.length > 0 && techStack.map((techItem, idx) => (
             <span
               key={idx}
-              className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-400"
+              className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
             >
               {techItem.tech || techItem}
             </span>
@@ -94,7 +94,7 @@ function ProjectCard({ project, index, isDesignProject = false }) {
             portfolioTags.map((tag) => (
               <span 
                 key={tag.id}
-                className="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
               >
                 {tag.name}
               </span>
@@ -203,7 +203,7 @@ function ProjectCard({ project, index, isDesignProject = false }) {
                       {techStack.map((techItem, idx) => (
                         <span
                           key={idx}
-                          className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-400"
+                          className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
                         >
                           {techItem.tech || techItem}
                         </span>
@@ -260,25 +260,38 @@ export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
   const loading = webLoading || designLoading;
   const error = webError || designError;
 
-  // Filter projects by selected tags (case-insensitive slug match)
+  // Slugify for matching (WordPress-style: lowercase, replace non-alphanumeric with hyphen)
+  const slugify = (s) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  // Filter projects: use portfolioTags when available, else fall back to techStack / category (ACF)
+  const projectMatchesTags = (project, selectedSlugs, details) => {
+    const tags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
+    const tagSlugs = tags.map((t) => slugify(t?.slug || t?.name)).filter(Boolean);
+    if (tagSlugs.length > 0) {
+      return selectedSlugs.some((slug) => tagSlugs.includes(slug));
+    }
+    // Fallback: match against techStack (web) or category (design)
+    const techStack = details?.techStack || details?.techstack || [];
+    const techSlugs = techStack.map((item) => slugify(typeof item === "string" ? item : item?.tech)).filter(Boolean);
+    const categorySlug = slugify(details?.category);
+    const matchSlugs = [...techSlugs, categorySlug].filter(Boolean);
+    return selectedSlugs.some((slug) => matchSlugs.includes(slug));
+  };
+
   const filteredWebProjects = useMemo(() => {
     if (selectedTags.length === 0) return webProjects;
-    const selectedSlugs = selectedTags.map(s => (s || "").toLowerCase());
-    return webProjects.filter(project => {
-      const projectTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
-      const projectTagSlugs = projectTags.map(tag => (tag?.slug || tag?.name || "").toLowerCase()).filter(Boolean);
-      return selectedSlugs.some(slug => projectTagSlugs.includes(slug));
-    });
+    const selectedSlugs = selectedTags.map((s) => slugify(s));
+    return webProjects.filter((project) =>
+      projectMatchesTags(project, selectedSlugs, project.webProjectDetails || project.webprojectdetails)
+    );
   }, [webProjects, selectedTags]);
 
   const filteredDesignProjects = useMemo(() => {
     if (selectedTags.length === 0) return designProjects;
-    const selectedSlugs = selectedTags.map(s => (s || "").toLowerCase());
-    return designProjects.filter(project => {
-      const projectTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
-      const projectTagSlugs = projectTags.map(tag => (tag?.slug || tag?.name || "").toLowerCase()).filter(Boolean);
-      return selectedSlugs.some(slug => projectTagSlugs.includes(slug));
-    });
+    const selectedSlugs = selectedTags.map((s) => slugify(s));
+    return designProjects.filter((project) =>
+      projectMatchesTags(project, selectedSlugs, project.designProjectDetails || project.designprojectdetails)
+    );
   }, [designProjects, selectedTags]);
 
   return (

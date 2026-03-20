@@ -151,7 +151,7 @@ function RepositoryCard({ repository, index }) {
                 portfolioTags.map((tag) => (
                   <span 
                     key={tag.id}
-                    className="text-xs px-2 py-1 rounded font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                    className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
                   >
                     {tag.name}
                   </span>
@@ -264,14 +264,24 @@ export function Repositories({ portfolioTags = [], selectedTags = [], onToggleTa
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { repositories, loading, error } = useRepositories();
 
-  // Filter repositories by selected tags (case-insensitive slug match)
+  // Slugify for matching (WordPress-style)
+  const slugify = (s) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  // Filter: use portfolioTags when available, else fall back to language/platform
   const filteredRepositories = useMemo(() => {
     if (selectedTags.length === 0) return repositories;
-    const selectedSlugs = selectedTags.map(s => (s || "").toLowerCase());
-    return repositories.filter(repository => {
-      const repoTags = repository.portfolioTags?.nodes || repository.portfoliotags?.nodes || [];
-      const repoTagSlugs = repoTags.map(tag => (tag?.slug || tag?.name || "").toLowerCase()).filter(Boolean);
-      return selectedSlugs.some(slug => repoTagSlugs.includes(slug));
+    const selectedSlugs = selectedTags.map((s) => slugify(s));
+    return repositories.filter((repository) => {
+      const tags = repository.portfolioTags?.nodes || repository.portfoliotags?.nodes || [];
+      const tagSlugs = tags.map((t) => slugify(t?.slug || t?.name)).filter(Boolean);
+      if (tagSlugs.length > 0) {
+        return selectedSlugs.some((slug) => tagSlugs.includes(slug));
+      }
+      const details = repository.repositoryDetails || repository.repositorydetails || {};
+      const language = slugify(details.language);
+      const platform = slugify(details.platform);
+      const repoSlugs = [language, platform].filter(Boolean);
+      return selectedSlugs.some((slug) => repoSlugs.includes(slug));
     });
   }, [repositories, selectedTags]);
 
