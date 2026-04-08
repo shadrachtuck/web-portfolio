@@ -14,13 +14,16 @@ export function TagFilter({ tags = [], loading, selectedTags = [], onToggleTag }
       transition={{ duration: 0.8, delay: 0.1 }}
       className="mb-8 px-6 md:px-16 lg:px-24"
     >
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mr-2">Filter by tag:</span>
+      <div className="flex flex-wrap gap-2 items-center font-sans">
+        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mr-2">
+          Filter by tag:
+        </span>
         {tags.map((tag) => (
           <button
             key={tag.id}
+            type="button"
             onClick={() => onToggleTag(tag.slug)}
-            className={`px-4 py-2 text-sm inline-flex transition-all ${
+            className={`rounded-none px-4 py-2 text-sm inline-flex transition-colors antialiased ${
               selectedTags.includes(tag.slug)
                 ? "bg-zinc-200 dark:bg-zinc-700 ring-1 ring-zinc-400 dark:ring-zinc-500"
                 : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
@@ -32,8 +35,9 @@ export function TagFilter({ tags = [], loading, selectedTags = [], onToggleTag }
         ))}
         {selectedTags.length > 0 && (
           <button
+            type="button"
             onClick={() => onToggleTag(null)}
-            className="px-4 py-2 text-sm inline-flex bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+            className="rounded-none px-4 py-2 text-sm inline-flex bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 antialiased"
           >
             Clear filters
           </button>

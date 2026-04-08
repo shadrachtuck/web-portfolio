@@ -280,11 +280,13 @@ export function Hero() {
             aria-label="Scroll to previous section"
           >
             <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
+              animate={{ y: [2.5, -2.5, 2.5] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <span className="arrow-btn-icon-up text-4xl md:text-5xl font-ds-terminal header-style leading-none">v</span>
+              <span className="arrow-btn-icon-up text-4xl md:text-5xl font-ds-terminal header-style leading-none inline-flex min-h-[1em] min-w-[1ch]">
+                v
+              </span>
             </motion.div>
           </motion.button>
           <span className="text-xs font-ds-terminal text-[#12490d] dark:text-green-400 text-center w-full">Jump to section</span>
@@ -311,11 +313,11 @@ export function Hero() {
               aria-label="Scroll to next section"
             >
               <motion.div
-                animate={{ y: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
+                animate={{ y: [-2.5, 2.5, -2.5] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute inset-0 flex items-center justify-center"
               >
-                <span className="arrow-btn-icon-down text-4xl md:text-5xl font-ds-terminal header-style leading-none">v</span>
+                <span className="arrow-btn-icon-down text-4xl md:text-5xl font-ds-terminal header-style leading-none inline-flex min-h-[1em] min-w-[1ch]">v</span>
               </motion.div>
             </motion.button>
           )}

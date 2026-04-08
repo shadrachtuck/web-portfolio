@@ -141,11 +141,13 @@ export function About() {
                         aria-label="Previous skills"
                       >
                         <motion.div
-                          animate={{ x: [0, -4, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
+                          animate={{ x: [2, -2, 2] }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                           className="absolute inset-0 flex items-center justify-center"
                         >
-                          <span className="arrow-btn-icon-left font-ds-terminal header-style leading-none">v</span>
+                          <span className="arrow-btn-icon-left text-4xl md:text-5xl font-ds-terminal header-style leading-none inline-flex min-h-[1em] min-w-[1ch]">
+                            v
+                          </span>
                         </motion.div>
                       </motion.button>
                     )}
@@ -162,11 +164,13 @@ export function About() {
                       aria-label="Next skills"
                     >
                       <motion.div
-                        animate={canPageRight ? { x: [0, 4, 0] } : {}}
-                        transition={{ duration: 1.5, repeat: Infinity }}
+                        animate={canPageRight ? { x: [-2, 2, -2] } : {}}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                         className="absolute inset-0 flex items-center justify-center"
                       >
-                        <span className="arrow-btn-icon-right font-ds-terminal header-style leading-none">v</span>
+                        <span className="arrow-btn-icon-right text-4xl md:text-5xl font-ds-terminal header-style leading-none inline-flex min-h-[1em] min-w-[1ch]">
+                          v
+                        </span>
                       </motion.div>
                     </motion.button>
                   </div>
@@ -177,11 +181,11 @@ export function About() {
               {tagsLoading ? (
                 <div className="text-sm text-zinc-600 dark:text-zinc-400">Loading skills...</div>
               ) : (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 font-sans">
                   {pagedSkills.map((tag) => (
                     <span
                       key={tag.id}
-                      className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
+                      className="rounded-none px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex antialiased"
                     >
                       {tag.name}
                     </span>

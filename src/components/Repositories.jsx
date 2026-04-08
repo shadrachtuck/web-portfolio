@@ -151,7 +151,7 @@ function RepositoryCard({ repository, index }) {
                 portfolioTags.map((tag) => (
                   <span 
                     key={tag.id}
-                    className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
+                    className="rounded-none px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex font-sans antialiased"
                   >
                     {tag.name}
                   </span>

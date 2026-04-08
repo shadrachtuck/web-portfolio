@@ -61,19 +61,19 @@ function ProjectCard({ project, index, isDesignProject = false }) {
             <span className="text-sm text-zinc-500 dark:text-zinc-400">{details.year}</span>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex flex-wrap content-center gap-2 mb-2 font-sans">
           {techStack.length > 0 && techStack.map((techItem, idx) => (
             <span
               key={idx}
-              className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
+              className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex rounded-none"
             >
               {techItem.tech || techItem}
             </span>
           ))}
-          {/* Design Project Category */}
+          {/* Design project category — red UX/UI chip (matches software tag shape, not purple category style) */}
           {isDesignProject && category && (
-            <span 
-              className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium"
+            <span
+              className="px-4 py-2 bg-red-100 dark:bg-red-950/50 text-red-900 dark:text-red-200 text-sm inline-flex rounded-none capitalize"
             >
               {category}
             </span>
@@ -94,7 +94,7 @@ function ProjectCard({ project, index, isDesignProject = false }) {
             portfolioTags.map((tag) => (
               <span 
                 key={tag.id}
-                className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
+                className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex rounded-none"
               >
                 {tag.name}
               </span>
@@ -199,11 +199,11 @@ function ProjectCard({ project, index, isDesignProject = false }) {
                 {techStack.length > 0 && (
                   <div>
                     <h4 className="text-sm font-semibold text-green-400 mb-2 font-ds-terminal">Technologies:</h4>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap content-center gap-2 font-sans">
                       {techStack.map((techItem, idx) => (
                         <span
                           key={idx}
-                          className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex"
+                          className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex rounded-none"
                         >
                           {techItem.tech || techItem}
                         </span>

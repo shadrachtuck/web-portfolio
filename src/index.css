@@ -179,32 +179,41 @@ body {
   }
 }
 
+/* Nav arrows: translate BEFORE rotate so vertical nudge is screen-space (rotate then translateY moved along wrong axis) */
 .arrow-btn-icon-up {
   font-size: 4rem;
-  transform: rotate(180deg);
+  transform: translateY(6px) rotate(180deg);
+  transform-origin: center center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 .arrow-btn-icon-down {
   font-size: 4rem;
+  transform: translateY(-6px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 .arrow-btn-icon-left {
   font-size: 2.5rem;
-  transform: rotate(90deg);
+  transform: translateY(3px) rotate(90deg);
+  transform-origin: center center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 .arrow-btn-icon-right {
   font-size: 2.5rem;
-  transform: rotate(-90deg);
+  transform: translateY(3px) rotate(-90deg);
+  transform-origin: center center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 
 /* Ensure other sections appear below hero and don't overlap */
