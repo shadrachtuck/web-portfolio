@@ -23,7 +23,7 @@ export function TagFilter({ tags = [], loading, selectedTags = [], onToggleTag }
             key={tag.id}
             type="button"
             onClick={() => onToggleTag(tag.slug)}
-            className={`rounded-none px-4 py-2 text-sm inline-flex transition-colors antialiased ${
+            className={`font-sans rounded-md px-4 py-2 text-sm inline-flex items-center justify-center content-center transition-colors antialiased ${
               selectedTags.includes(tag.slug)
                 ? "bg-zinc-200 dark:bg-zinc-700 ring-1 ring-zinc-400 dark:ring-zinc-500"
                 : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
@@ -37,7 +37,7 @@ export function TagFilter({ tags = [], loading, selectedTags = [], onToggleTag }
           <button
             type="button"
             onClick={() => onToggleTag(null)}
-            className="rounded-none px-4 py-2 text-sm inline-flex bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 antialiased"
+            className="font-sans rounded-md px-4 py-2 text-sm inline-flex items-center justify-center content-center bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 antialiased"
           >
             Clear filters
           </button>

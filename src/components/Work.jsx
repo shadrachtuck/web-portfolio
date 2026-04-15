@@ -5,7 +5,7 @@ import { useWebProjects, useDesignProjects } from "../hooks/useWordPressData";
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { normalizeContributionTypeTags, getProjectUrl, getGithubUrl, getContributionTypeTagLabel, getContributionTypeTagColor } from "../lib/mishap-types.js";
 
-function ProjectCard({ project, index, isDesignProject = false }) {
+function ProjectCard({ project, index }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [isExpanded, setIsExpanded] = useState(false);
@@ -24,7 +24,6 @@ function ProjectCard({ project, index, isDesignProject = false }) {
   const description = project.content || project.excerpt || "";
   const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags ?? details.contributiontypetags);
   const portfolioTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
-  const category = details.category;
 
   return (
     <motion.div
@@ -65,25 +64,17 @@ function ProjectCard({ project, index, isDesignProject = false }) {
           {techStack.length > 0 && techStack.map((techItem, idx) => (
             <span
               key={idx}
-              className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex rounded-none"
+              className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex items-center justify-center content-center rounded-md"
             >
               {techItem.tech || techItem}
             </span>
           ))}
-          {/* Design project category — red UX/UI chip (matches software tag shape, not purple category style) */}
-          {isDesignProject && category && (
-            <span
-              className="px-4 py-2 bg-red-100 dark:bg-red-950/50 text-red-900 dark:text-red-200 text-sm inline-flex rounded-none capitalize"
-            >
-              {category}
-            </span>
-          )}
           {/* Contribution Type Tags */}
           {contributionTypeTags && Array.isArray(contributionTypeTags) && contributionTypeTags.length > 0 && (
             contributionTypeTags.map((tag, idx) => (
               <span 
                 key={`tag-${idx}`}
-                className={`px-3 py-1 text-xs font-medium ${getContributionTypeTagColor(tag)}`}
+                className={`px-3 py-1 text-xs font-medium inline-flex items-center justify-center content-center rounded-md ${getContributionTypeTagColor(tag)}`}
               >
                 {getContributionTypeTagLabel(tag)}
               </span>
@@ -94,7 +85,7 @@ function ProjectCard({ project, index, isDesignProject = false }) {
             portfolioTags.map((tag) => (
               <span 
                 key={tag.id}
-                className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex rounded-none"
+                className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex items-center justify-center content-center rounded-md"
               >
                 {tag.name}
               </span>
@@ -203,7 +194,7 @@ function ProjectCard({ project, index, isDesignProject = false }) {
                       {techStack.map((techItem, idx) => (
                         <span
                           key={idx}
-                          className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex rounded-none"
+                          className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex items-center justify-center content-center rounded-md"
                         >
                           {techItem.tech || techItem}
                         </span>
@@ -263,18 +254,19 @@ export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
   // Slugify for matching (WordPress-style: lowercase, replace non-alphanumeric with hyphen)
   const slugify = (s) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-  // Filter projects: use portfolioTags when available, else fall back to techStack / category (ACF)
+  // Filter projects: use portfolioTags when available, else fall back to techStack / contribution type tags (ACF)
   const projectMatchesTags = (project, selectedSlugs, details) => {
     const tags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
     const tagSlugs = tags.map((t) => slugify(t?.slug || t?.name)).filter(Boolean);
     if (tagSlugs.length > 0) {
       return selectedSlugs.some((slug) => tagSlugs.includes(slug));
     }
-    // Fallback: match against techStack (web) or category (design)
     const techStack = details?.techStack || details?.techstack || [];
     const techSlugs = techStack.map((item) => slugify(typeof item === "string" ? item : item?.tech)).filter(Boolean);
-    const categorySlug = slugify(details?.category);
-    const matchSlugs = [...techSlugs, categorySlug].filter(Boolean);
+    const contributionSlugs = normalizeContributionTypeTags(
+      details?.contributionTypeTags ?? details?.contributiontypetags
+    ).map((t) => slugify(t));
+    const matchSlugs = [...techSlugs, ...contributionSlugs].filter(Boolean);
     return selectedSlugs.some((slug) => matchSlugs.includes(slug));
   };
 
@@ -341,7 +333,7 @@ export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
               </motion.div>
               <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
                 {filteredWebProjects.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} index={index} isDesignProject={false} />
+                  <ProjectCard key={project.id} project={project} index={index} />
                 ))}
               </div>
             </div>
@@ -362,7 +354,7 @@ export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
               </motion.div>
               <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
                 {filteredDesignProjects.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} index={index} isDesignProject={true} />
+                  <ProjectCard key={project.id} project={project} index={index} />
                 ))}
               </div>
             </div>

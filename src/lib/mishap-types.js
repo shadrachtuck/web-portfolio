@@ -4,8 +4,8 @@
  * Source of truth: mishap-creative-works plugin (portfolio-backend).
  * ACF field definitions: wp-content/plugins/mishap-creative-works/acf-json/
  *
- * GraphQL field names: WPGraphQL for ACF exposes ACF fields; some use lowercase
- * (projecturl, githuburl) vs snake_case (project_url). Components handle both.
+ * GraphQL field names: WPGraphQL for ACF uses camelCase (projectUrl, githubUrl, contributionTypeTags).
+ * Components still accept legacy lowercase keys when reading cached/old payloads.
  */
 
 /** @typedef {'software_web' | 'ux_ui_design'} ContributionTypeTagSlug */
@@ -32,7 +32,6 @@
 /**
  * Design Project Details (ACF: group_design_project_fields)
  * @typedef {Object} DesignProjectDetails
- * @property {string} [category] - branding | print | digital | packaging | other
  * @property {string} [client]
  * @property {number} [year]
  * @property {string} [projecturl] - ACF: project_url

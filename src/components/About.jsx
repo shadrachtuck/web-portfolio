@@ -181,11 +181,11 @@ export function About() {
               {tagsLoading ? (
                 <div className="text-sm text-zinc-600 dark:text-zinc-400">Loading skills...</div>
               ) : (
-                <div className="flex flex-wrap gap-2 font-sans">
+                <div className="flex flex-wrap content-center gap-2 font-sans">
                   {pagedSkills.map((tag) => (
                     <span
                       key={tag.id}
-                      className="rounded-none px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex antialiased"
+                      className="rounded-md px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex items-center justify-center content-center antialiased"
                     >
                       {tag.name}
                     </span>

@@ -70,15 +70,15 @@ export const GET_WEB_PROJECTS = `
           }
           client
           year
-          projecturl
-          githuburl
+          projectUrl
+          githubUrl
           screenshots {
             nodes {
               sourceUrl
               altText
             }
           }
-          contributiontypetags
+          contributionTypeTags
         }
         portfolioTags {
           nodes {
@@ -116,18 +116,18 @@ export const GET_REPOSITORIES = `
           }
         }
         repositoryDetails {
-          linktype
-          contributionmeta
-          repositoryurl
-          siteurl
+          linkType
+          contributionMeta
+          repositoryUrl
+          siteUrl
           platform
           language
           stars
-          contributiontype
+          contributionType
           isFork
           year
-          contributiontypetags
-          customlogo {
+          contributionTypeTags
+          customLogo {
             node {
               sourceUrl
               altText
@@ -170,17 +170,16 @@ export const GET_DESIGN_PROJECTS = `
           }
         }
         designProjectDetails {
-          category
           client
           year
-          projecturl
+          projectUrl
           gallery {
             nodes {
               sourceUrl
               altText
             }
           }
-          contributiontypetags
+          contributionTypeTags
         }
         portfolioTags {
           nodes {

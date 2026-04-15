@@ -111,7 +111,7 @@ function RepositoryCard({ repository, index }) {
                 )}
                 <h3 className="text-xl md:text-2xl font-semibold">{repository.title}</h3>
                 {isRepository && isFork && (
-                  <span className="text-xs px-2 py-1 bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400">
+                  <span className="text-xs px-2 py-1 inline-flex items-center justify-center content-center rounded-md bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400">
                     Fork
                   </span>
                 )}
@@ -120,7 +120,7 @@ function RepositoryCard({ repository, index }) {
                 <span className="text-sm text-zinc-500 dark:text-zinc-400">{details.year}</span>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center content-center gap-2">
                 {isRepository && (details.contributionType || details.contributiontype) && (
                   <span className="text-sm text-zinc-500 dark:text-zinc-400 capitalize">
                     {(details.contributionType || details.contributiontype).replace("_", " ")}
@@ -128,7 +128,7 @@ function RepositoryCard({ repository, index }) {
                 )}
               {/* Platform tag for repositories */}
               {isRepository && (
-                <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded font-medium text-white ${platformColors[platform] || platformColors.other}`}>
+                <span className={`inline-flex items-center justify-center content-center gap-1.5 text-xs px-2 py-1 rounded-md font-medium text-white ${platformColors[platform] || platformColors.other}`}>
                   <PlatformIcon platform={platform} isRepository={true} className="w-3.5 h-3.5" />
                   <span>{platform === "azure" ? "Azure" : platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
                 </span>
@@ -139,7 +139,7 @@ function RepositoryCard({ repository, index }) {
                   {contributionTypeTags.map((tag, idx) => (
                     <span 
                       key={idx}
-                      className={`text-xs px-2 py-1 rounded font-medium ${getContributionTypeTagColor(tag)}`}
+                      className={`text-xs px-2 py-1 inline-flex items-center justify-center content-center rounded-md font-medium ${getContributionTypeTagColor(tag)}`}
                     >
                       {getContributionTypeTagLabel(tag)}
                     </span>
@@ -151,7 +151,7 @@ function RepositoryCard({ repository, index }) {
                 portfolioTags.map((tag) => (
                   <span 
                     key={tag.id}
-                    className="rounded-none px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex font-sans antialiased"
+                    className="rounded-md px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-sm inline-flex items-center justify-center content-center font-sans antialiased"
                   >
                     {tag.name}
                   </span>
