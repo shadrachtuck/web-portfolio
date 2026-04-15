@@ -1,6 +1,6 @@
 /**
  * Application configuration (env).
- * GraphQL ACF fields: camelCase (matches current WPGraphQL for ACF). See src/lib/graphql.js.
+ * GraphQL: see graphql.js — align WPGraphQL + WPGraphQL for ACF versions across hosts so ACF field names match (camelCase).
  */
 
 /**

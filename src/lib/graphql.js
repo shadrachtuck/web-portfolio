@@ -1,16 +1,13 @@
 /**
- * GraphQL client for WordPress (WPGraphQL + WPGraphQL for ACF, current releases).
+ * GraphQL client for WordPress (WPGraphQL + WPGraphQL for ACF).
  *
- * ACF field `names` (e.g. project_url) are exposed as camelCase GraphQL fields (projectUrl).
- * Queries below use that convention only; do not use legacy all-lowercase ACF field aliases.
+ * ACF subfields use camelCase in GraphQL (e.g. projectUrl). Keep WordPress plugin
+ * versions aligned across environments so the schema matches — no alternate query shapes here.
  *
- * Source of truth for ACF groups: mishap-creative-works acf-json/
- * Runtime shapes / helpers: src/lib/mishap-types.js
+ * ACF: mishap-creative-works acf-json/ · helpers: src/lib/mishap-types.js
  */
 
 import { WP_GRAPHQL_URL } from './config.js';
-
-// WP_GRAPHQL_URL — set VITE_WP_GRAPHQL_URL in .env.local or your host (e.g. Vercel).
 
 /**
  * Execute a GraphQL query
@@ -22,10 +19,7 @@ export async function graphqlRequest(query, variables = {}) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
+      body: JSON.stringify({ query, variables }),
     });
 
     if (!response.ok) {
@@ -45,9 +39,6 @@ export async function graphqlRequest(query, variables = {}) {
   }
 }
 
-/**
- * Fetch all web projects
- */
 export const GET_WEB_PROJECTS = `
   query GetWebProjects($first: Int, $after: String) {
     webProjects(first: $first, after: $after) {
@@ -96,9 +87,6 @@ export const GET_WEB_PROJECTS = `
   }
 `;
 
-/**
- * Fetch all repositories
- */
 export const GET_REPOSITORIES = `
   query GetRepositories($first: Int, $after: String) {
     repositories(first: $first, after: $after) {
@@ -150,9 +138,6 @@ export const GET_REPOSITORIES = `
   }
 `;
 
-/**
- * Fetch all design projects
- */
 export const GET_DESIGN_PROJECTS = `
   query GetDesignProjects($first: Int, $after: String) {
     designProjects(first: $first, after: $after) {
@@ -197,9 +182,6 @@ export const GET_DESIGN_PROJECTS = `
   }
 `;
 
-/**
- * Fetch all portfolio tags
- */
 export const GET_PORTFOLIO_TAGS = `
   query GetPortfolioTags($first: Int) {
     portfolioTags(first: $first) {
@@ -217,9 +199,6 @@ export const GET_PORTFOLIO_TAGS = `
   }
 `;
 
-/**
- * Site settings (custom RootQuery field from mishap-creative-works plugin; camelCase in GraphQL).
- */
 export const GET_SITE_SETTINGS = `
   query GetSiteSettings {
     siteSettings {
@@ -232,9 +211,6 @@ export const GET_SITE_SETTINGS = `
   }
 `;
 
-/**
- * Fetch About page content + ACF fields by URI
- */
 export const GET_ABOUT_PAGE = `
   query GetAboutPage($uri: String!) {
     pageBy(uri: $uri) {
@@ -259,4 +235,3 @@ export const GET_ABOUT_PAGE = `
     }
   }
 `;
-

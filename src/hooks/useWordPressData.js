@@ -11,11 +11,7 @@ export function useWebProjects() {
       try {
         setLoading(true);
         setError(null);
-        
-        // Introspection disabled - was causing errors in production
-        // GraphQL introspection is not allowed for public requests by default
-        // If needed for debugging, enable it in WPGraphQL Settings on the WordPress backend
-        
+
         const data = await graphqlRequest(GET_WEB_PROJECTS, { first: 100 });
         const fetchedProjects = data?.webProjects?.nodes || [];
         setProjects(fetchedProjects);
@@ -24,7 +20,6 @@ export function useWebProjects() {
         console.error("Error fetching web projects:", err);
         setError(err.message || "Failed to load projects");
         setLoading(false);
-        // Set empty array on error so UI doesn't break
         setProjects([]);
       }
     }
@@ -45,7 +40,7 @@ export function useRepositories() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const data = await graphqlRequest(GET_REPOSITORIES, { first: 100 });
         const fetchedRepositories = data?.repositories?.nodes || [];
         setRepositories(fetchedRepositories);
@@ -54,7 +49,6 @@ export function useRepositories() {
         console.error("Error fetching repositories:", err);
         setError(err.message || "Failed to load repositories");
         setLoading(false);
-        // Set empty array on error so UI doesn't break
         setRepositories([]);
       }
     }
@@ -75,7 +69,7 @@ export function useDesignProjects() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const data = await graphqlRequest(GET_DESIGN_PROJECTS, { first: 100 });
         const fetchedProjects = data?.designProjects?.nodes || [];
         setProjects(fetchedProjects);
@@ -104,9 +98,7 @@ export function usePortfolioTags() {
       try {
         setLoading(true);
         setError(null);
-        
-        // WPGraphQL connections default to 10 items if `first` isn’t provided.
-        // We fetch a larger set so UI can paginate client-side.
+
         const data = await graphqlRequest(GET_PORTFOLIO_TAGS, { first: 200 });
         const fetchedTags = data?.portfolioTags?.nodes || [];
         setTags(fetchedTags);

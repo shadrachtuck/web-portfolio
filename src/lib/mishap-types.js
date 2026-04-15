@@ -2,7 +2,7 @@
  * Mishap Creative Works — types and helpers for WPGraphQL + ACF (camelCase field names).
  *
  * ACF JSON: wp-content/plugins/mishap-creative-works/acf-json/
- * Helpers read camelCase first, then legacy lowercase only if present (defensive).
+ * Helpers assume camelCase GraphQL fields (aligned WPGraphQL for ACF versions).
  */
 
 /** @typedef {'software_web' | 'ux_ui_design'} ContributionTypeTagSlug */
@@ -63,24 +63,24 @@ export function normalizeContributionTypeTags(raw) {
   return nodes.map((n) => (typeof n === 'string' ? n : n?.slug)).filter(Boolean);
 }
 
-/** @param {{ projectUrl?: string; projecturl?: string }} details */
+/** @param {{ projectUrl?: string }} details */
 export function getProjectUrl(details) {
-  return details?.projectUrl || details?.projecturl;
+  return details?.projectUrl;
 }
 
-/** @param {{ githubUrl?: string; githuburl?: string }} details */
+/** @param {{ githubUrl?: string }} details */
 export function getGithubUrl(details) {
-  return details?.githubUrl || details?.githuburl;
+  return details?.githubUrl;
 }
 
-/** @param {{ repositoryUrl?: string; repositoryurl?: string }} details */
+/** @param {{ repositoryUrl?: string }} details */
 export function getRepositoryUrl(details) {
-  return details?.repositoryUrl || details?.repositoryurl;
+  return details?.repositoryUrl;
 }
 
-/** @param {{ siteUrl?: string; siteurl?: string }} details */
+/** @param {{ siteUrl?: string }} details */
 export function getSiteUrl(details) {
-  return details?.siteUrl || details?.siteurl;
+  return details?.siteUrl;
 }
 
 /**
