@@ -1,16 +1,16 @@
 /**
- * GraphQL client for WordPress WPGraphQL
- * Web Development Portfolio - Web Projects Only
+ * GraphQL client for WordPress (WPGraphQL + WPGraphQL for ACF, current releases).
  *
- * Field names match mishap-creative-works plugin ACF (wp-content/plugins/mishap-creative-works/acf-json/).
- * See src/lib/mishap-types.js for type definitions and accessor helpers.
+ * ACF field `names` (e.g. project_url) are exposed as camelCase GraphQL fields (projectUrl).
+ * Queries below use that convention only; do not use legacy all-lowercase ACF field aliases.
+ *
+ * Source of truth for ACF groups: mishap-creative-works acf-json/
+ * Runtime shapes / helpers: src/lib/mishap-types.js
  */
 
 import { WP_GRAPHQL_URL } from './config.js';
 
-// WP_GRAPHQL_URL is now imported from config.js which uses environment variables
-// Set VITE_WP_GRAPHQL_URL in .env.local for local development
-// Set VITE_WP_GRAPHQL_URL in Vercel for production
+// WP_GRAPHQL_URL — set VITE_WP_GRAPHQL_URL in .env.local or your host (e.g. Vercel).
 
 /**
  * Execute a GraphQL query
@@ -218,10 +218,7 @@ export const GET_PORTFOLIO_TAGS = `
 `;
 
 /**
- * Fetch site settings (social links, etc.)
- * Note: ACF field names are converted to camelCase in GraphQL
- * github_url -> githubUrl, linkedin_url -> linkedinUrl, email_address -> emailAddress
- * Options pages are accessed via acfOptions with the field group name
+ * Site settings (custom RootQuery field from mishap-creative-works plugin; camelCase in GraphQL).
  */
 export const GET_SITE_SETTINGS = `
   query GetSiteSettings {

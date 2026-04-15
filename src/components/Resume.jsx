@@ -13,13 +13,9 @@ export function Resume() {
     async function fetchResumePdfUrl() {
       try {
         const data = await graphqlRequest(GET_SITE_SETTINGS);
-        const siteSettings = data?.siteSettings || data?.sitesettings;
-        // Prefer the backend proxy endpoint (forces attachment download + avoids CORS)
-        const dlUrl = siteSettings?.resumePdfDownloadUrl || siteSettings?.resumepdfdownloadurl;
+        const siteSettings = data?.siteSettings;
+        const dlUrl = siteSettings?.resumePdfDownloadUrl;
         const validUrl = dlUrl && dlUrl.trim() !== "" ? dlUrl : null;
-        // #region agent log
-        fetch('http://127.0.0.1:7245/ingest/9ae61d99-5cfa-4d18-a3ac-b9bc61952471',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'484352'},body:JSON.stringify({sessionId:'484352',location:'Resume.jsx:20',message:'Resume PDF URL fetch result',data:{hasSiteSettings:!!data?.siteSettings,resumePdfDownloadUrl:dlUrl,validUrl,rawKeys:data?.siteSettings?Object.keys(data.siteSettings):[]},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-        // #endregion
         setResumePdfDownloadUrl(validUrl);
       } catch (error) {
         console.error("Error fetching resume PDF URL:", error);

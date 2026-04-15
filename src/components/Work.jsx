@@ -11,19 +11,19 @@ function ProjectCard({ project, index }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
 
-  const details = project.webProjectDetails || project.webprojectdetails || project.designProjectDetails || project.designprojectdetails || {};
-  const featuredImage = project.featuredImage?.node || project.featuredimage?.node;
+  const details = project.webProjectDetails || project.designProjectDetails || {};
+  const featuredImage = project.featuredImage?.node;
   const galleryConnection = details.screenshots || details.gallery;
   const gallery = galleryConnection?.nodes || galleryConnection || [];
   // Featured image always shows at top; no fallback to gallery
   const mainImage = featuredImage;
   // Normalize techStack: GraphQL returns [{ tech: "React" }, ...]; ensure we always have strings for rendering
-  const techStack = (details.techStack || details.techstack || []).map((item) =>
+  const techStack = (details.techStack || []).map((item) =>
     typeof item === 'string' ? item : (item?.tech ?? item?.value ?? '')
   ).filter(Boolean);
   const description = project.content || project.excerpt || "";
-  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags ?? details.contributiontypetags);
-  const portfolioTags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
+  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags);
+  const portfolioTags = project.portfolioTags?.nodes || [];
 
   return (
     <motion.div
@@ -256,16 +256,16 @@ export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
 
   // Filter projects: use portfolioTags when available, else fall back to techStack / contribution type tags (ACF)
   const projectMatchesTags = (project, selectedSlugs, details) => {
-    const tags = project.portfolioTags?.nodes || project.portfoliotags?.nodes || [];
+    const tags = project.portfolioTags?.nodes || [];
     const tagSlugs = tags.map((t) => slugify(t?.slug || t?.name)).filter(Boolean);
     if (tagSlugs.length > 0) {
       return selectedSlugs.some((slug) => tagSlugs.includes(slug));
     }
-    const techStack = details?.techStack || details?.techstack || [];
+    const techStack = details?.techStack || [];
     const techSlugs = techStack.map((item) => slugify(typeof item === "string" ? item : item?.tech)).filter(Boolean);
-    const contributionSlugs = normalizeContributionTypeTags(
-      details?.contributionTypeTags ?? details?.contributiontypetags
-    ).map((t) => slugify(t));
+    const contributionSlugs = normalizeContributionTypeTags(details?.contributionTypeTags).map((t) =>
+      slugify(t)
+    );
     const matchSlugs = [...techSlugs, ...contributionSlugs].filter(Boolean);
     return selectedSlugs.some((slug) => matchSlugs.includes(slug));
   };
@@ -274,7 +274,7 @@ export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
     if (selectedTags.length === 0) return webProjects;
     const selectedSlugs = selectedTags.map((s) => slugify(s));
     return webProjects.filter((project) =>
-      projectMatchesTags(project, selectedSlugs, project.webProjectDetails || project.webprojectdetails)
+      projectMatchesTags(project, selectedSlugs, project.webProjectDetails)
     );
   }, [webProjects, selectedTags]);
 
@@ -282,7 +282,7 @@ export function Work({ portfolioTags = [], selectedTags = [], onToggleTag }) {
     if (selectedTags.length === 0) return designProjects;
     const selectedSlugs = selectedTags.map((s) => slugify(s));
     return designProjects.filter((project) =>
-      projectMatchesTags(project, selectedSlugs, project.designProjectDetails || project.designprojectdetails)
+      projectMatchesTags(project, selectedSlugs, project.designProjectDetails)
     );
   }, [designProjects, selectedTags]);
 

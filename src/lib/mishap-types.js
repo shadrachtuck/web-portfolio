@@ -1,11 +1,8 @@
 /**
- * Mishap Creative Works Portfolio - Type Definitions
+ * Mishap Creative Works — types and helpers for WPGraphQL + ACF (camelCase field names).
  *
- * Source of truth: mishap-creative-works plugin (portfolio-backend).
- * ACF field definitions: wp-content/plugins/mishap-creative-works/acf-json/
- *
- * GraphQL field names: WPGraphQL for ACF uses camelCase (projectUrl, githubUrl, contributionTypeTags).
- * Components still accept legacy lowercase keys when reading cached/old payloads.
+ * ACF JSON: wp-content/plugins/mishap-creative-works/acf-json/
+ * Helpers read camelCase first, then legacy lowercase only if present (defensive).
  */
 
 /** @typedef {'software_web' | 'ux_ui_design'} ContributionTypeTagSlug */
@@ -13,15 +10,13 @@
 /**
  * Web Project Details (ACF: group_web_project_fields)
  * @typedef {Object} WebProjectDetails
- * @property {{ tech: string }[]} [techStack] - Repeater; sub-field: tech
+ * @property {{ tech: string }[]} [techStack]
  * @property {string} [client]
  * @property {number} [year]
- * @property {string} [projecturl] - ACF: project_url
- * @property {string} [projectUrl] - Alternative camelCase
- * @property {string} [githuburl] - ACF: github_url
- * @property {string} [githubUrl] - Alternative camelCase
- * @property {{ nodes: { sourceUrl: string; altText?: string }[] }} [screenshots] - Gallery
- * @property {ContributionTypeTagsData} [contributionTypeTags] - ACF: checkbox [String] or AcfTermNodeConnection
+ * @property {string} [projectUrl]
+ * @property {string} [githubUrl]
+ * @property {{ nodes: { sourceUrl: string; altText?: string }[] }} [screenshots]
+ * @property {ContributionTypeTagsData} [contributionTypeTags]
  */
 
 /**
@@ -34,8 +29,7 @@
  * @typedef {Object} DesignProjectDetails
  * @property {string} [client]
  * @property {number} [year]
- * @property {string} [projecturl] - ACF: project_url
- * @property {string} [projectUrl] - Alternative camelCase
+ * @property {string} [projectUrl]
  * @property {{ nodes: { sourceUrl: string; altText?: string }[] }} [gallery]
  * @property {ContributionTypeTagsData} [contributionTypeTags]
  */
@@ -43,17 +37,17 @@
 /**
  * Repository Details (ACF: group_repository_fields)
  * @typedef {Object} RepositoryDetails
- * @property {string} [linktype] - ACF: link_type - repository | site
- * @property {string} [contributionmeta] - ACF: contribution_meta
- * @property {string} [repositoryurl] - ACF: repository_url
- * @property {string} [siteurl] - ACF: site_url
- * @property {string} [platform] - github | gitlab | bitbucket | azure | other
+ * @property {string} [linkType]
+ * @property {string} [contributionMeta]
+ * @property {string} [repositoryUrl]
+ * @property {string} [siteUrl]
+ * @property {string} [platform]
  * @property {string} [language]
  * @property {number} [stars]
- * @property {string} [contributiontype] - ACF: contribution_type
- * @property {boolean} [isFork] - ACF: is_fork
+ * @property {string} [contributionType]
+ * @property {boolean} [isFork]
  * @property {number} [year]
- * @property {{ node: { sourceUrl: string; altText?: string } }} [customlogo] - ACF: custom_logo
+ * @property {{ node?: { sourceUrl: string; altText?: string } }} [customLogo]
  * @property {ContributionTypeTagsData} [contributionTypeTags]
  */
 
@@ -69,40 +63,24 @@ export function normalizeContributionTypeTags(raw) {
   return nodes.map((n) => (typeof n === 'string' ? n : n?.slug)).filter(Boolean);
 }
 
-/**
- * Get project URL from details (handles projecturl / projectUrl)
- * @param {{ projecturl?: string; projectUrl?: string }} details
- * @returns {string | undefined}
- */
+/** @param {{ projectUrl?: string; projecturl?: string }} details */
 export function getProjectUrl(details) {
-  return details?.projecturl || details?.projectUrl;
+  return details?.projectUrl || details?.projecturl;
 }
 
-/**
- * Get GitHub URL from details (handles githuburl / githubUrl)
- * @param {{ githuburl?: string; githubUrl?: string }} details
- * @returns {string | undefined}
- */
+/** @param {{ githubUrl?: string; githuburl?: string }} details */
 export function getGithubUrl(details) {
-  return details?.githuburl || details?.githubUrl;
+  return details?.githubUrl || details?.githuburl;
 }
 
-/**
- * Get repository URL from details (handles repositoryurl / repositoryUrl)
- * @param {{ repositoryurl?: string; repositoryUrl?: string }} details
- * @returns {string | undefined}
- */
+/** @param {{ repositoryUrl?: string; repositoryurl?: string }} details */
 export function getRepositoryUrl(details) {
-  return details?.repositoryurl || details?.repositoryUrl;
+  return details?.repositoryUrl || details?.repositoryurl;
 }
 
-/**
- * Get site URL from details (handles siteurl / siteUrl)
- * @param {{ siteurl?: string; siteUrl?: string }} details
- * @returns {string | undefined}
- */
+/** @param {{ siteUrl?: string; siteurl?: string }} details */
 export function getSiteUrl(details) {
-  return details?.siteurl || details?.siteUrl;
+  return details?.siteUrl || details?.siteurl;
 }
 
 /**

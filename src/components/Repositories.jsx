@@ -63,17 +63,17 @@ function RepositoryCard({ repository, index }) {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const details = repository.repositoryDetails || repository.repositorydetails || {};
-  const featuredImage = repository.featuredImage?.node || repository.featuredimage?.node;
+  const details = repository.repositoryDetails || {};
+  const featuredImage = repository.featuredImage?.node;
   const description = repository.content || repository.excerpt || "";
-  const linkType = details.linkType || details.linktype || "repository";
+  const linkType = details.linkType || "repository";
   const isRepository = linkType === "repository";
   const platform = details.platform || "github";
   // ACF image fields return as ConnectionEdge, so we access node directly
-  const customLogo = details.customLogo?.node || details.customLogo || details.customlogo?.node || details.customlogo;
-  const isFork = details.isFork === true || details.isFork === 1 || details.isfork === true || details.isfork === 1;
-  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags ?? details.contributiontypetags);
-  const portfolioTags = repository.portfolioTags?.nodes || repository.portfoliotags?.nodes || [];
+  const customLogo = details.customLogo?.node || details.customLogo;
+  const isFork = details.isFork === true || details.isFork === 1;
+  const contributionTypeTags = normalizeContributionTypeTags(details.contributionTypeTags);
+  const portfolioTags = repository.portfolioTags?.nodes || [];
 
   const platformColors = {
     github: "bg-zinc-800 dark:bg-zinc-700",
@@ -272,12 +272,12 @@ export function Repositories({ portfolioTags = [], selectedTags = [], onToggleTa
     if (selectedTags.length === 0) return repositories;
     const selectedSlugs = selectedTags.map((s) => slugify(s));
     return repositories.filter((repository) => {
-      const tags = repository.portfolioTags?.nodes || repository.portfoliotags?.nodes || [];
+      const tags = repository.portfolioTags?.nodes || [];
       const tagSlugs = tags.map((t) => slugify(t?.slug || t?.name)).filter(Boolean);
       if (tagSlugs.length > 0) {
         return selectedSlugs.some((slug) => tagSlugs.includes(slug));
       }
-      const details = repository.repositoryDetails || repository.repositorydetails || {};
+      const details = repository.repositoryDetails || {};
       const language = slugify(details.language);
       const platform = slugify(details.platform);
       const repoSlugs = [language, platform].filter(Boolean);

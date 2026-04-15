@@ -1,7 +1,6 @@
 /**
- * Application Configuration
- * Centralized configuration using environment variables
- * Accessible across the entire codebase
+ * Application configuration (env).
+ * GraphQL ACF fields: camelCase (matches current WPGraphQL for ACF). See src/lib/graphql.js.
  */
 
 /**
