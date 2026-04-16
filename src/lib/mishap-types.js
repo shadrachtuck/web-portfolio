@@ -1,8 +1,8 @@
 /**
- * Mishap Creative Works — types and helpers for WPGraphQL + ACF (camelCase field names).
+ * Mishap Creative Works — types and helpers for WPGraphQL + ACF.
  *
  * ACF JSON: wp-content/plugins/mishap-creative-works/acf-json/
- * Helpers assume camelCase GraphQL fields (aligned WPGraphQL for ACF versions).
+ * GraphQL queries alias lowercase ACF fields to camelCase keys; helpers expect camelCase on details objects.
  */
 
 /** @typedef {'software_web' | 'ux_ui_design'} ContributionTypeTagSlug */
