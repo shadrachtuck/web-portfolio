@@ -1,13 +1,44 @@
 /**
  * Application configuration (env).
  * GraphQL: see graphql.js — WPGraphQL for ACF field naming can differ by host (camelCase vs all-lowercase).
+ *
+ * Vite embeds VITE_* at build time. If you run `npm run build` with only .env pointing at
+ * portfolio-backend.local, the shipped bundle would call that host from users' browsers (wrong).
+ * resolveWpGraphqlUrl() forces the public WordPress GraphQL URL in production builds when the env URL is dev-only.
  */
 
+const DEFAULT_REMOTE_GRAPHQL_URL = 'https://backend.shadrach-tuck.dev/graphql';
+
+/** True for hostnames that must never be used in a production browser bundle */
+function isDevOnlyGraphqlUrl(urlString) {
+  if (!urlString || typeof urlString !== 'string') return false;
+  try {
+    const h = new URL(urlString.trim()).hostname.toLowerCase();
+    return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h.endsWith('.local');
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Get the WordPress GraphQL API endpoint
- * Falls back to production if not set
+ * WordPress GraphQL endpoint the browser will call.
+ * - development: uses VITE_WP_GRAPHQL_URL from .env / .env.local (typically local WP).
+ * - production build: uses VITE_WP_GRAPHQL_URL unless it points at a dev-only host; then uses the remote default.
  */
-export const WP_GRAPHQL_URL = import.meta.env.VITE_WP_GRAPHQL_URL || 'https://backend.shadrach-tuck.dev/graphql';
+function resolveWpGraphqlUrl() {
+  const raw = import.meta.env.VITE_WP_GRAPHQL_URL;
+  const fromEnv = raw != null && String(raw).trim() !== '' ? String(raw).trim() : null;
+  if (fromEnv) {
+    if (import.meta.env.PROD && isDevOnlyGraphqlUrl(fromEnv)) {
+      return DEFAULT_REMOTE_GRAPHQL_URL;
+    }
+    return fromEnv;
+  }
+  return DEFAULT_REMOTE_GRAPHQL_URL;
+}
+
+/** @type {string} */
+export const WP_GRAPHQL_URL = resolveWpGraphqlUrl();
 
 /**
  * How ACF subfields appear in the GraphQL schema for this WPGraphQL URL.

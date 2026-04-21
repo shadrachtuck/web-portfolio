@@ -5,6 +5,7 @@
  * depending on WPGraphQL for ACF version / host. We pick the query shape via
  * config.WP_GRAPHQL_ACF_FIELD_CASING (auto: lowercase only for backend.shadrach-tuck.dev).
  * Aliases map lowercase schema fields to camelCase response keys when needed.
+ * Note: ACF `true_false` (e.g. is_fork) may still be exposed as `isFork` on the remote schema — query that name directly, not `isfork`.
  *
  * ACF: mishap-creative-works acf-json/ · helpers: src/lib/mishap-types.js
  */
@@ -71,7 +72,7 @@ const REPOSITORY_DETAILS = ACF_LOWER
           language
           stars
           contributionType: contributiontype
-          isFork: isfork
+          isFork
           year
           contributionTypeTags: contributiontypetags
           customLogo: customlogo {
